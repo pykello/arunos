@@ -43,6 +43,28 @@ strcmp(const char *s1, const char *s2)
 }
 
 
+/*
+ * strcpy copies the given null-terminated source string into the given target.
+ * It returns the pointer to the target.
+ */
+char *
+strcpy(char *target, const char *source)
+{
+	char *result = target;
+
+	while (*source)
+	{
+		*target = *source;
+		target++;
+		source++;
+	}
+
+	*target = '\0';
+
+	return result;
+}
+
+
 /* strlen returns the length of the given null-terminated string. */
 size_t
 strlen(const char *str)

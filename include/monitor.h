@@ -24,6 +24,8 @@ extern void monitor(void);
 extern int mon_help(int argc, char **argv);
 extern int mon_hextee(int argc, char **argv);
 extern int mon_kerninfo(int argc, char **argv);
+extern int mon_status(int argc, char **argv);
+
 
 /* monitor commands declarations */
 static Command const commands[] = {
@@ -41,6 +43,11 @@ static Command const commands[] = {
 		"kerninfo",
 		"Displays information about the kernel", 
 		(command_handler) mon_kerninfo
+	},
+	{
+		"status",
+		"Displays current status of the system", 
+		(command_handler) mon_status
 	},
 };
 

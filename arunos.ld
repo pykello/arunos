@@ -15,6 +15,7 @@ SECTIONS
 
  . = . + 0x1000; /* 4kB of stack memory */
  kernel_stack_start = .;
+ PROVIDE(ekernel_stack_start = .);
 
  . += 0x1000;
  irq_stack_start = .;

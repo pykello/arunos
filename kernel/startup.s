@@ -26,14 +26,6 @@ copy_interrupt_table:
     mov pc, lr
 
 
-enable_interrupts:
-    mrs r1, cpsr
-    bic r1, r1, #0x80
-    msr cpsr_c, r1
-
-    mov pc, lr
-
-
 setup_irq_stack_pointer:
     mrs r0, cpsr
     bic r1, r0, #0x1F
@@ -57,7 +49,7 @@ interrupt_table_start:
 interrupt_table_end:
 
 
-irq_entry:
+irq_entry: 
     push {r0-r12, lr}
     bl dispatch_interrupts
     pop {r0-r12, lr}
