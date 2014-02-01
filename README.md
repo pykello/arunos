@@ -9,7 +9,8 @@ I will improve it as I continue studying this course.
 
 
 Hardware Support
-================
+----------------
+
 I test the operating system on [ARM926](http://www.arm.com/products/processors/classic/arm9/arm926.php)
 processor and Versatile Platform Baseboard using [QEMU]
 (http://wiki.qemu.org/Main_Page). I haven't tested it on any real hardware yet.
@@ -20,14 +21,16 @@ I aim to port it to a real Raspberry Pi computer in future.
 
 
 Current Status
-==============
+--------------
+
 Currently, the OS is able to communicate with serial I/O port uart0, and provides
 a simple shell which have few commands. To see the commands supported, you can
 run help in the shell.
 
 
 Compiling
-=========
+---------
+
 You need to install the GNU tools for cross-compilation for arm-none-eabi target
 to be able to compile the code. To install these tools in Fedora 19, you can do:
 
@@ -43,7 +46,8 @@ After making, the OS image is created as a single "arunos.bin" binary file.
 
 
 Emulating
-=========
+---------
+
 To emulate the operating system, you need to install QEMU. To do this in Fedora 19,
 you can do:
 
@@ -57,7 +61,8 @@ To terminate the emulation, you can press Ctrl-A X keys.
 
 
 Debugging
-=========
+---------
+
 The default GDB doesn't work with ARM binaries, so you need to compile GDB
 manually to be able to debug Arunos. To do this, you can download gdb, then
 configure it for arm-none-eabi target, and then make and install it:
@@ -85,7 +90,31 @@ Then, you can use gdb commands to debug Arunos.
     set auto-load safe-path /
 
 
+Coding Style
+------------
+
+The coding style used in this project is based on [Linux kernel coding style]
+(https://www.kernel.org/doc/Documentation/CodingStyle). Here is some guidelines:
+
+ * Use tabs for indentation,
+ * Each tab is 8 character width,
+ * Each line should be limited to 80 characters,
+ * Use underscore delimited names for functions and variables,
+ * Use camel case names for structs and enums,
+ * Don't typedef structs and enums,
+ * Open the braces in the same line, except for functions,
+ * If the condition is multiple lines, open the brace in a separate line,
+ * Don't use braces for single line blocks,
+ * Don't indent "case" statements in a switch/case statement,
+ * Separate functions by a single empty line,
+ * Don't comment how something is done, but what is being done,
+ * Short names for local variables are allowed unless they introduce confusion,
+ * Use descriptive names for global variables and functions.
+
+
+
 License
-========
+-------
+
 This software is BSD licensed. For more details, see the LICENSE file.
 
