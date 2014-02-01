@@ -24,3 +24,12 @@ read_cpsr:
 	mrs r0, cpsr
 	mov pc, lr
 
+.global read_fp
+read_fp:
+	mov r0, fp
+	mov pc, lr
+
+.global read_sp
+read_sp:
+	mov r0, sp
+	mov pc, lr

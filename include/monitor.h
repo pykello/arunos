@@ -24,6 +24,7 @@ struct Command {
 void monitor(void);
 
 /* monitor command function declarations */
+int mon_backtrace(int argc, char **argv);
 int mon_help(int argc, char **argv);
 int mon_hextee(int argc, char **argv);
 int mon_kerninfo(int argc, char **argv);
@@ -35,6 +36,10 @@ static struct Command const commands[] = {
 		"help", 
 		"Displays this list of commands", 
 		(command_handler) mon_help
+	}, {
+		"backtrace",
+		"Backtrace ...",
+		(command_handler) mon_backtrace
 	}, {
 		"hextee",
 		"Reads from input and outputs the hexadecimal codes",
@@ -50,6 +55,6 @@ static struct Command const commands[] = {
 	},
 };
 
-#define COMMAND_COUNT 4
+#define COMMAND_COUNT 5
 
 #endif
