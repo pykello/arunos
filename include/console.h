@@ -1,35 +1,33 @@
+/*
+ * console.h
+ *
+ * Type and function declarations for interacting with console.
+ *
+ * (c) 2014 Hadi Moshayedi <hadi@moshayedi.net>
+ */
+
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-
 #define MAX_SPECIAL_KEY_SEQ_LEN 6
 
-/* codes for special keys */
-typedef enum SpecialKeyType
-{
+enum SpecialKey {
 	SPECIAL_KEYS_START = 0x1000,
-
 	KEY_ARROW_UP,
 	KEY_ARROW_DOWN,
 	KEY_ARROW_RIGHT,
 	KEY_ARROW_LEFT,
-
 	KEY_BACKSPACE
-
-} SpecialKeyType;
+};
 
 /* character sequence for a sepcial key */
-typedef struct SpecialKeySequence
-{
-	SpecialKeyType code;
+struct SpecialKeySequence {
+	enum SpecialKey code;
 	char sequence[MAX_SPECIAL_KEY_SEQ_LEN];
-
-} SpecialKeySequence;
-
+};
 
 /* null-terminated character sequences for special keys */
-static const SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
-
+static const struct SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
 	/* arrow keys */
 	{KEY_ARROW_UP,    {0x1b, 0x5b, 0x41, 0x00}},
 	{KEY_ARROW_DOWN,  {0x1b, 0x5b, 0x42, 0x00}},
@@ -40,12 +38,11 @@ static const SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
 	{KEY_BACKSPACE,   {0x7f, 0x00}}
 };
 
-#define SPECIAL_KEY_COUNT (sizeof(SPECIAL_KEY_SEQUENCES) / sizeof(SpecialKeySequence))
-
+#define SPECIAL_KEY_COUNT 5
 
 /* function declarations for interfacing with concole */
-extern void console_init(void);
-extern void putch(int c);
-extern int getch(void);
+void console_init(void);
+void putch(int c);
+int getch(void);
 
 #endif

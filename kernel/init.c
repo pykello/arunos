@@ -1,7 +1,5 @@
-#include "irq.h"
-#include "console.h"
-#include "monitor.h"
-
+#include <console.h>
+#include <monitor.h>
 
 /*
  * Kernel starts executing C code here. Before entring this function, some

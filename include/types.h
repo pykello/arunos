@@ -1,3 +1,11 @@
+/*
+ * types.h
+ *
+ * Common types and constants declarations.
+ *
+ * (c) 2014 Hadi Moshayedi <hadi@moshayedi.net>
+ */
+
 #ifndef TYPES_H
 #define TYPES_H
 
