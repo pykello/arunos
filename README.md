@@ -81,7 +81,7 @@ directory to the directory of Arunos. In terminal window 1, run:
 
 In terminal window 2, run:
     
-    gdb
+    arm-none-eabi-gdb
 
 Then, you can use gdb commands to debug Arunos.
 
