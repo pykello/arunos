@@ -3,8 +3,7 @@
 #include <types.h>
 
 /* mon_kerninfo */
-int
-mon_kerninfo(int argc, char **argv)
+int mon_kerninfo(int argc, char **argv)
 {
 	extern char entry[], etext[], edata[], end[];
 	int footprint_kb = (end - entry + 1023) / 1024;

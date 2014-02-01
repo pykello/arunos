@@ -73,8 +73,7 @@ void putch(int c)
  * getch reads the next available character from receive_buffer. If the buffer
  * is empty, this function returns 0.
  */
-int
-getch(void)
+int getch(void)
 {
 	int keycode = 0;
 	char sequence[MAX_SPECIAL_KEY_SEQ_LEN] = {0};
@@ -152,8 +151,7 @@ static bool is_special_key_sequence_prefix(char *sequence)
  * get_special_key_code returns the code of a special key with the given
  * sequence. If no such special key is found, it returns 0.
  */
-static int
-get_special_key_code(char *sequence)
+static int get_special_key_code(char *sequence)
 {
 	int keycode = 0;
 	size_t i = 0;
@@ -172,8 +170,7 @@ get_special_key_code(char *sequence)
  * get_special_key_sequence returns the sequence of a special key with the given
  * code. If no such special key is found, it returns NULL.
  */
-static char *
-get_special_key_sequence(int code)
+static char *get_special_key_sequence(int code)
 {
 	char *sequence = 0;
 	size_t i = 0;
