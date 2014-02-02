@@ -38,7 +38,7 @@ static struct Command const commands[] = {
 		(command_handler) mon_help
 	}, {
 		"backtrace",
-		"Backtrace ...",
+		"Displays the current stack backtrace",
 		(command_handler) mon_backtrace
 	}, {
 		"hextee",

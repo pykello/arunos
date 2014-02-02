@@ -11,7 +11,7 @@
 
 #include <lib/stdarg.h>
 
-#define BUFFER_MAX_LENGTH 128
+#define BUFFER_MAX_LENGTH 256
 
 char *gets(char *buffer);
 int printf(const char *format, ...);

@@ -1,6 +1,20 @@
 #include <lib/string.h>
 #include <types.h>
 
+void *memcpy(void *target, const void *source, size_t n)
+{
+	char *target_buffer = (char *) target;
+	char *source_buffer = (char *) source;
+	size_t i = 0;
+
+	for (i = 0; i < n; i++)
+	{
+		target_buffer[i] = source_buffer[i];
+	}
+
+	return target;
+}
+
 /*
  * strchr returns a pointer to the first occurence of the given character in the
  * given string. If the character is not found, it returns NULL.

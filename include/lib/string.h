@@ -11,6 +11,7 @@
 
 #include <types.h>
 
+void *memcpy(void *target, const void *source, size_t n);
 char *strchr(const char *str, int character);
 int strcmp(const char *s1, const char *s2);
 char *strcpy(char *target, const char *source);

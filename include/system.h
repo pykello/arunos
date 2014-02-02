@@ -23,6 +23,5 @@ void enable_interrupts(void);
 char *get_stack_pointer(int cpu_mode);
 int read_cpsr(void);
 int *read_fp(void);
-int *read_sp(void);
 
 #endif

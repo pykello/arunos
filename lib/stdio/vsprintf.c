@@ -53,7 +53,7 @@ int vsprintf(char *target, const char *format, va_list ap)
 		/* char */
 		case 'c':
 		{
-			target[target_index] = va_arg(ap, int);;
+			target[target_index] = (char) va_arg(ap, int);
 			target_index++;
 
 			break;
