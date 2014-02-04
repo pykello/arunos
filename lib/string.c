@@ -1,6 +1,10 @@
 #include <lib/string.h>
 #include <types.h>
 
+/*
+ * memcmp copies n bytes from the source buffer to the target buffer. It returns
+ * the pointer to the target.
+ */
 void *memcpy(void *target, const void *source, size_t n)
 {
 	char *target_buffer = (char *) target;
@@ -8,41 +12,9 @@ void *memcpy(void *target, const void *source, size_t n)
 	size_t i = 0;
 
 	for (i = 0; i < n; i++)
-	{
 		target_buffer[i] = source_buffer[i];
-	}
 
 	return target;
-}
-
-/*
- * strchr returns a pointer to the first occurence of the given character in the
- * given string. If the character is not found, it returns NULL.
- */
-char *strchr(const char *str, int character)
-{
-	while (*str != '\0' && *str != character)
-		str++;
-
-	if (*str == character)
-		return (char *) str;
-	else
-		return NULL;
-}
-
-/*
- * strcmp compares the given input strings using the lexicographical order, and
- * returns 0 if s1 == s2, returns a negative number if s1 < s2, and returns a 
- * positive number if s1 > s2.
- */
-int strcmp(const char *s1, const char *s2)
-{
-	while (*s1 == *s2 && *s1 != '\0' && *s2 != '\0') {
-		s1++;
-		s2++;
-	}
-
-	return (*s1 - *s2);
 }
 
 /*
@@ -64,17 +36,44 @@ char *strcpy(char *target, const char *source)
 	return result;
 }
 
-/* strlen returns the length of the given null-terminated string. */
-size_t strlen(const char *str)
+/*
+ * strlcpy copies source to the target with size n. At most n - 1 characters
+ * will be copied and the resulting target will always be null-terminated. The
+ * function returns strlen(source). If return value is >= n, then truncation
+ * occured.
+ */
+size_t strlcpy(char *target, const char *source, size_t n)
 {
-	size_t length = 0;
-	while (*str != '\0') {
-		str++;
-		length++;
+	size_t source_len = 0;
+	size_t i = 0;
+
+	while (i + 1 < n && source[i] != '\0')
+	{
+		target[i] = source[i];
+		i++;
+	}
+	target[i] = '\0';
+
+	source_len = strlen(source);
+	return source_len;
+}
+
+
+/*
+ * strcmp compares the given input strings using the lexicographical order, and
+ * returns 0 if s1 == s2, returns a negative number if s1 < s2, and returns a 
+ * positive number if s1 > s2.
+ */
+int strcmp(const char *s1, const char *s2)
+{
+	while (*s1 == *s2 && *s1 != '\0' && *s2 != '\0') {
+		s1++;
+		s2++;
 	}
 
-	return length;
+	return (*s1 - *s2);
 }
+
 
 /*
  * strncmp compares the given input strings upto n characters using the
@@ -94,6 +93,21 @@ int strncmp(const char *s1, const char *s2, size_t n)
 	}
 
 	return (*s1 - *s2);	
+}
+
+/*
+ * strchr returns a pointer to the first occurence of the given character in the
+ * given string. If the character is not found, it returns NULL.
+ */
+char *strchr(const char *str, int character)
+{
+	while (*str != '\0' && *str != character)
+		str++;
+
+	if (*str == character)
+		return (char *) str;
+	else
+		return NULL;
 }
 
 /*
@@ -135,4 +149,16 @@ char *strtok(char *str, const char *delimiters)
 	}
 
 	return token;
+}
+
+/* strlen returns the length of the given null-terminated string. */
+size_t strlen(const char *str)
+{
+	size_t length = 0;
+	while (*str != '\0') {
+		str++;
+		length++;
+	}
+
+	return length;
 }

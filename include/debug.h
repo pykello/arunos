@@ -39,10 +39,13 @@ struct SymbolTableEntry {
 #define SYMBOL_FUNCTION       0x24
 #define SYMBOL_SOURCE_LINE    0x44
 #define SYMBOL_SOURCE_FILE    0x64
-#define SYMBOL_STACK_VARIABLE 0x80
 #define SYMBOL_PARAMETER      0xa0
 
-/* Pointers to debug info in ".stab" section */
+/*
+ * Pointers to debug info in ".stab" and ".stabstr" sections. To see where these
+ * pointers are set, see the linker script with .ld extension and also the -gstab
+ * compiler flag.
+ */
 extern const struct SymbolTableEntry STAB_BEGIN[];
 extern const struct SymbolTableEntry STAB_END[];
 extern const char STABSTR_BEGIN[];

@@ -11,12 +11,20 @@
 
 #include <types.h>
 
+/* copy functions */
 void *memcpy(void *target, const void *source, size_t n);
-char *strchr(const char *str, int character);
-int strcmp(const char *s1, const char *s2);
 char *strcpy(char *target, const char *source);
-size_t strlen(const char *str);
+size_t strlcpy(char *target, const char *source, size_t n);
+
+/* compare functions */
+int strcmp(const char *s1, const char *s2);
 int strncmp(const char *s1, const char *s2, size_t n);
-char *strtok (char *str, const char *delimiters);
+
+/* search and tokenization */
+char *strchr(const char *str, int character);
+char *strtok(char *str, const char *delimiters);
+
+/* other functions */
+size_t strlen(const char *str);
 
 #endif
