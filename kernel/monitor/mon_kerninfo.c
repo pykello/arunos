@@ -2,7 +2,7 @@
 #include <lib/stdio.h>
 #include <types.h>
 
-/* mon_kerninfo */
+/* mon_kerninfo displays information about the kernel. */
 int mon_kerninfo(int argc, char **argv)
 {
 	extern char entry[], etext[], edata[], end[];

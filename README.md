@@ -2,7 +2,7 @@ Arunos
 ======
 
 Arunos is a simple operating system for ARM processors. I started creating it to
-teach myself how operating systems work. It is design is based on the JOS 
+teach myself how operating systems work. Its design is based on the JOS 
 operating system which is used in the labs of the [6.828 operating system
 engineering course at MIT](http://pdos.csail.mit.edu/6.828/2011/schedule.html). 
 I will improve it as I continue studying this course.
@@ -14,8 +14,8 @@ Hardware Support
 I test the operating system on [ARM926](http://www.arm.com/products/processors/classic/arm9/arm926.php)
 processor and Versatile Platform Baseboard using [QEMU]
 (http://wiki.qemu.org/Main_Page). I haven't tested it on any real hardware yet.
-The reason for choosing ARM926 and VersatilePB was simply that QEMU supports
-them well.
+The reason for choosing ARM926 and VersatilePB was QEMU's good support for this
+platform.
 
 I aim to port it to a real Raspberry Pi computer in future.
 
@@ -25,7 +25,7 @@ Current Status
 
 Currently, the OS is able to communicate with serial I/O port uart0, and provides
 a simple shell which have few commands. To see the commands supported, you can
-run help in the shell.
+run "help" in the shell.
 
 
 Compiling
@@ -37,7 +37,7 @@ to be able to compile the code. To install these tools in Fedora 19, you can do:
     sudo yum install arm-none-eabi-binutils-cs
     sudo yum install arm-none-eabi-gcc-cs
 
-After you install these tools, you can run the following command to build the
+After installing these tools, you can run the following command to build the
 kernel:
 
     make
@@ -57,7 +57,7 @@ After qemu-system-arm is installed, run the following command to emulate the OS:
 
     make qemu
 
-To terminate the emulation, you can press Ctrl-A X keys.
+To terminate the emulation, you can press Ctrl-A X key combination.
 
 
 Debugging
@@ -75,7 +75,7 @@ configure it for arm-none-eabi target, and then make and install it:
     sudo make install
 
 After installation finishes, open two terminal windows and set their current
-directory to the directory of Arunos. In terminal window 1, run:
+directories to the directory of Arunos. In terminal window 1, run:
 
     make qemu-gdb
 
@@ -94,16 +94,16 @@ Coding Style
 ------------
 
 The coding style used in this project is based on [Linux kernel coding style]
-(https://www.kernel.org/doc/Documentation/CodingStyle). Here is some guidelines:
+(https://www.kernel.org/doc/Documentation/CodingStyle). Here are some guidelines:
 
  * Use tabs for indentation,
- * Each tab is 8 character width,
+ * Each tab is 8 characters wide,
  * Each line should be limited to 80 characters,
  * Use underscore delimited names for functions and variables,
  * Use camel case names for structs and enums,
  * Don't typedef structs and enums,
  * Open the braces in the same line, except for functions,
- * If the condition is multiple lines, open the brace in a separate line,
+ * If a condition is multiple lines, open the braces in a separate line,
  * Don't use braces for single line blocks,
  * Don't indent "case" statements in a switch/case statement,
  * Separate functions by a single empty line,

@@ -47,8 +47,7 @@ size_t strlcpy(char *target, const char *source, size_t n)
 	size_t source_len = 0;
 	size_t i = 0;
 
-	while (i + 1 < n && source[i] != '\0')
-	{
+	while (i + 1 < n && source[i] != '\0') {
 		target[i] = source[i];
 		i++;
 	}
