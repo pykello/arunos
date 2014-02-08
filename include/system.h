@@ -46,6 +46,17 @@ enum {
 	CACHE_TYPE_INSTRUCTION_SIZE = 0x0000fff
 };
 
+enum {
+	TCM_TYPE_DATA_COUNT        = 0x70000,
+	TCM_TYPE_INSTRUCTION_COUNT = 0x00007
+};
+
+enum {
+	TLB_TYPE_INSTRUCTION_LOCKS = 0xff0000,
+	TLB_TYPE_DATA_LOCKS        = 0x00ff00,
+	TLB_TYPE_SEPARATE          = 0x000001
+};
+
 static char * const cpu_mode_string[CPU_MODE_MAX] = {
 	[CPU_MODE_USER] = "user",
 	[CPU_MODE_SUPERVISOR] = "supervisor",
@@ -87,5 +98,7 @@ int read_cpsr(void);
 int *read_fp(void);
 int read_cpu_id(void);
 int read_cache_type(void);
+int read_tcm_type(void);
+int read_tlb_type(void);
 
 #endif

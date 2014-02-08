@@ -6,6 +6,8 @@
 
 static void print_cpu_id(void);
 static void print_cache_type(void);
+static void print_tcm_type(void);
+static void print_tlb_type(void);
 static void print_cpsr_status(void);
 static void print_supervisor_sp(void);
 static void print_irq_sp(void);
@@ -19,6 +21,8 @@ int mon_status(int argc, char **argv)
 
 	print_cpu_id();
 	print_cache_type();
+	print_tcm_type();
+	print_tlb_type();
 	print_cpsr_status();
 	print_supervisor_sp();
 	print_irq_sp();
@@ -49,7 +53,28 @@ static void print_cache_type(void)
 	printf("cache: type=%s, data_size=%d, instruction_size=%d\n",
 	       separate ? "separate" : "unified",
 	       data_size, instruction_size);
+}
 
+static void print_tcm_type(void)
+{
+	int tcm_type = read_tcm_type();
+	int data_count = get_bits(tcm_type, TCM_TYPE_DATA_COUNT);
+	int instruction_count = get_bits(tcm_type, TCM_TYPE_INSTRUCTION_COUNT);
+
+	printf("tightly coupled memory: data_count=%d, instruction_count=%d\n",
+	       data_count, instruction_count);
+}
+
+static void print_tlb_type(void)
+{
+	int tlb_type = read_tlb_type();
+	int separate = get_bits(tlb_type, TLB_TYPE_SEPARATE);
+	int instruction_locks = get_bits(tlb_type, TLB_TYPE_INSTRUCTION_LOCKS);
+	int data_locks = get_bits(tlb_type, TLB_TYPE_DATA_LOCKS);
+
+	printf("translation lookaside buffers: type=%s, instruction_locks=%d, "
+	       "data_locks=%d\n", separate ? "separate" : "unified",
+	       instruction_locks, data_locks);
 }
 
 static void print_cpsr_status(void)

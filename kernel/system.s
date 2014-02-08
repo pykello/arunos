@@ -38,3 +38,13 @@ read_cpu_id:
 read_cache_type:
 	mrc p15, 0, r0, cr0, cr0, 1
 	mov pc, lr
+
+.global read_tcm_type
+read_tcm_type:
+	mrc p15, 0, r0, cr0, cr0, 2
+	mov pc, lr
+
+.global read_tlb_type
+read_tlb_type:
+	mrc p15, 0, r0, cr0, cr0, 3
+	mov pc, lr
