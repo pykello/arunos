@@ -150,6 +150,18 @@ char *strtok(char *str, const char *delimiters)
 	return token;
 }
 
+/* memset fills the given target with given length with the given character. */
+void *memset(void *target, int c, size_t len)
+{
+	char *target_buffer = (char *) target;
+
+	size_t i = 0;
+	for (i = 0; i < len; i++)
+		target_buffer[i] = (char) c;
+
+	return target;
+}
+
 /* strlen returns the length of the given null-terminated string. */
 size_t strlen(const char *str)
 {

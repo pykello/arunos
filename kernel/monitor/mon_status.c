@@ -4,64 +4,52 @@
 #include <system.h>
 #include <types.h>
 
-static void print_cpu_mode(int cpsr);
-static void print_instruction_set(int cpsr);
-static void print_irq_status(int cpsr);
-static void print_fiq_status(int cpsr);
+static void print_cpu_id(void);
+static void print_cpsr_status(void);
 static void print_supervisor_sp(void);
 static void print_irq_sp(void);
-static void get_cpu_mode_string(int cpu_mode, char *result);
-static void get_instruction_set_string(bool jazelle, bool thumb, char *result);
+static uint32_t get_bits(uint32_t n, uint32_t bitmask);
 
 /* mon_status displays information about the current status of system. */
 int mon_status(int argc, char **argv)
 {
-	int cpsr = 0;
-
 	(void) argc;
 	(void) argv;
 
-	cpsr = read_cpsr();
-
-	print_cpu_mode(cpsr);
-	print_instruction_set(cpsr);
-	print_irq_status(cpsr);
-	print_fiq_status(cpsr);
+	print_cpu_id();
+	print_cpsr_status();
 	print_supervisor_sp();
 	print_irq_sp();
 
 	return 0;
 }
 
-static void print_cpu_mode(int cpsr)
+static void print_cpu_id(void)
 {
-	char cpu_mode_string[16];
-	int cpu_mode = cpsr & 31;
-	get_cpu_mode_string(cpu_mode, cpu_mode_string);
-	printf("cpu mode: %s\n", cpu_mode_string);
+	int cpu_id = read_cpu_id();
+	int implementor = get_bits(cpu_id, CPU_ID_IMPLEMENTOR);
+	int architecture = get_bits(cpu_id, CPU_ID_ARCH_CODE);
+	int part_number = get_bits(cpu_id, CPU_ID_PART_NUMBER);
+
+	printf("cpu: implementor=%s, architecture=%s, part_number=%x\n",
+	       implementor_string[implementor],
+	       architecture_code_string[architecture],
+	       part_number);
 }
 
-static void print_instruction_set(int cpsr)
+static void print_cpsr_status(void)
 {
-	char instruction_set_string[16];
-	int jazelle = cpsr & (1 << 24);
-	int thumb = cpsr & (1 << 5);
-	get_instruction_set_string(jazelle, thumb, instruction_set_string);
-	printf("instruction set: %s\n", instruction_set_string);
-}
+	int cpsr = read_cpsr();
+	int cpu_mode = get_bits(cpsr, CPSR_CPU_MODE);
+	int instruction_set = get_bits(cpsr, CPSR_INSTRUCTION_SET);
+	int irq_disabled = get_bits(cpsr, CPSR_IRQ_DISABLED);
+	int fiq_disabled = get_bits(cpsr, CPSR_FIQ_DISABLED);
 
-static void print_irq_status(int cpsr)
-{
-	int irq_disabled = cpsr & (1 << 7);
-	char *irq_status = (irq_disabled ? "disabled" : "enabled");
-	printf("irq: %s\n", irq_status);
-}
-
-static void print_fiq_status(int cpsr)
-{
-	int fiq_disabled = cpsr & (1 << 6);
-	char *fiq_status = (fiq_disabled ? "disabled" : "enabled");
-	printf("fiq: %s\n", fiq_status);
+	printf("cpsr: cpu_mode=%s, instruction_set=%s, irq=%s, fiq=%s\n",
+	       cpu_mode_string[cpu_mode],
+	       instruction_set_string[instruction_set],
+	       irq_disabled ? "disabled" : "enabled",
+	       fiq_disabled ? "disabled" : "enabled");
 }
 
 static void print_supervisor_sp(void)
@@ -82,34 +70,14 @@ static void print_irq_sp(void)
 	      irq_stack_start - irq_stack_current);
 }
 
-static void get_cpu_mode_string(int cpu_mode, char *result)
+static uint32_t get_bits(uint32_t n, uint32_t bitmask)
 {
-	if (cpu_mode == CPU_MODE_USER)
-		strcpy(result, "user");
-	else if (cpu_mode == CPU_MODE_SUPERVISOR)
-		strcpy(result, "supervisor");
-	else if (cpu_mode == CPU_MODE_FIQ)
-		strcpy(result, "fiq");
-	else if (cpu_mode == CPU_MODE_IRQ)
-		strcpy(result, "irq");
-	else if (cpu_mode == CPU_MODE_ABORT)
-		strcpy(result, "abort");
-	else if (cpu_mode == CPU_MODE_UNDEFINED)
-		strcpy(result, "undefined");
-	else if (cpu_mode == CPU_MODE_SYSTEM)
-		strcpy(result, "system");
-	else
-		strcpy(result, "N/A");
-}
+	uint32_t result = 0;
+	int i = 0;
 
-static void get_instruction_set_string(bool jazelle, bool thumb, char *result)
-{
-	if (jazelle && !thumb)
-		strcpy(result, "jazelle");
-	else if (!jazelle && thumb)
-		strcpy(result, "thumb");
-	else if (!jazelle && !thumb)
-		strcpy(result, "arm");
-	else
-		strcpy(result, "N/A");
+	for (i = 31; i >= 0; i--)
+		if (bitmask & (1u << i))
+			result = result * 2 + ((n & (1u << i)) ? 1 : 0);
+
+	return result;
 }

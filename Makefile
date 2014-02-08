@@ -11,7 +11,7 @@ OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP := arm-none-eabi-objdump
 
 # flags
-CFLAGS = -mcpu=$(CPU) -gstabs -I include -marm -ansi -pedantic -Wall -Wextra \
+CFLAGS = -mcpu=$(CPU) -gstabs -I include -marm -std=c99 -pedantic -Wall -Wextra \
          -msoft-float -fPIC -mapcs-frame -fno-builtin-printf -fno-builtin-strcpy
 ASFLAGS = -mcpu=$(CPU) -g -I include
 QEMU_FLAGS = -M versatilepb -cpu arm926 -m 128M -nographic

@@ -29,7 +29,7 @@ read_fp:
 	mov r0, fp
 	mov pc, lr
 
-.global read_sp
-read_sp:
-	mov r0, sp
+.global read_cpu_id
+read_cpu_id:
+	mrc p15, 0, r0, cr0, cr0, 0
 	mov pc, lr

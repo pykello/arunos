@@ -25,6 +25,7 @@ char *strchr(const char *str, int character);
 char *strtok(char *str, const char *delimiters);
 
 /* other functions */
+void *memset(void *target, int c, size_t len);
 size_t strlen(const char *str);
 
 #endif
