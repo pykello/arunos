@@ -40,6 +40,12 @@ enum {
 	CPU_ID_IMPLEMENTOR  = 0x7f000000,
 };
 
+enum {
+	CACHE_TYPE_SEPARATE         = 0x1000000,
+	CACHE_TYPE_DATA_SIZE        = 0x0fff000,
+	CACHE_TYPE_INSTRUCTION_SIZE = 0x0000fff
+};
+
 static char * const cpu_mode_string[CPU_MODE_MAX] = {
 	[CPU_MODE_USER] = "user",
 	[CPU_MODE_SUPERVISOR] = "supervisor",
@@ -80,5 +86,6 @@ char *get_stack_pointer(int cpu_mode);
 int read_cpsr(void);
 int *read_fp(void);
 int read_cpu_id(void);
+int read_cache_type(void);
 
 #endif

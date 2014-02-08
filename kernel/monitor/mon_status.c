@@ -5,6 +5,7 @@
 #include <types.h>
 
 static void print_cpu_id(void);
+static void print_cache_type(void);
 static void print_cpsr_status(void);
 static void print_supervisor_sp(void);
 static void print_irq_sp(void);
@@ -17,6 +18,7 @@ int mon_status(int argc, char **argv)
 	(void) argv;
 
 	print_cpu_id();
+	print_cache_type();
 	print_cpsr_status();
 	print_supervisor_sp();
 	print_irq_sp();
@@ -35,6 +37,19 @@ static void print_cpu_id(void)
 	       implementor_string[implementor],
 	       architecture_code_string[architecture],
 	       part_number);
+}
+
+static void print_cache_type(void)
+{
+	int cache_type = read_cache_type();
+	bool separate = get_bits(cache_type, CACHE_TYPE_SEPARATE);
+	int data_size = get_bits(cache_type, CACHE_TYPE_DATA_SIZE);
+	int instruction_size = get_bits(cache_type, CACHE_TYPE_INSTRUCTION_SIZE);
+
+	printf("cache: type=%s, data_size=%d, instruction_size=%d\n",
+	       separate ? "separate" : "unified",
+	       data_size, instruction_size);
+
 }
 
 static void print_cpsr_status(void)

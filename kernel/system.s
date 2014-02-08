@@ -33,3 +33,8 @@ read_fp:
 read_cpu_id:
 	mrc p15, 0, r0, cr0, cr0, 0
 	mov pc, lr
+
+.global read_cache_type
+read_cache_type:
+	mrc p15, 0, r0, cr0, cr0, 1
+	mov pc, lr
