@@ -57,6 +57,15 @@ enum {
 	TLB_TYPE_SEPARATE          = 0x000001
 };
 
+enum {
+	CONTROL_MMU_ENABLED            = 0x0001,
+	CONTROL_ALIGNMENT_STRICT       = 0x0002,
+	CONTROL_L1_DATA_CACHE_ENABLED  = 0x0004,
+	CONTROL_WRITE_BUFFER_ENABLED   = 0x0008,
+	CONTROL_L1_INST_CACHE_ENABLED  = 0x1000,
+	CONTROL_HIGH_EXCEPTION_VECTORS = 0x2000
+};
+
 static char * const cpu_mode_string[CPU_MODE_MAX] = {
 	[CPU_MODE_USER] = "user",
 	[CPU_MODE_SUPERVISOR] = "supervisor",
@@ -100,5 +109,6 @@ int read_cpu_id(void);
 int read_cache_type(void);
 int read_tcm_type(void);
 int read_tlb_type(void);
+int read_control_register(void);
 
 #endif

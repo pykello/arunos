@@ -48,3 +48,8 @@ read_tcm_type:
 read_tlb_type:
 	mrc p15, 0, r0, cr0, cr0, 3
 	mov pc, lr
+
+.global read_control_register
+read_control_register:
+	mrc p15, 0, r0, cr1, cr0, 0
+	mov pc, lr

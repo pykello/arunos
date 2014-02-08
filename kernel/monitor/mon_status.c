@@ -8,6 +8,7 @@ static void print_cpu_id(void);
 static void print_cache_type(void);
 static void print_tcm_type(void);
 static void print_tlb_type(void);
+static void print_control_register(void);
 static void print_cpsr_status(void);
 static void print_supervisor_sp(void);
 static void print_irq_sp(void);
@@ -23,6 +24,7 @@ int mon_status(int argc, char **argv)
 	print_cache_type();
 	print_tcm_type();
 	print_tlb_type();
+	print_control_register();
 	print_cpsr_status();
 	print_supervisor_sp();
 	print_irq_sp();
@@ -75,6 +77,25 @@ static void print_tlb_type(void)
 	printf("translation lookaside buffers: type=%s, instruction_locks=%d, "
 	       "data_locks=%d\n", separate ? "separate" : "unified",
 	       instruction_locks, data_locks);
+}
+
+static void print_control_register(void)
+{
+	int control = read_control_register();
+	int mmu_enabled = get_bits(control, CONTROL_MMU_ENABLED);
+	int alignment_strict = get_bits(control, CONTROL_ALIGNMENT_STRICT);
+	int l1_data_enabled = get_bits(control, CONTROL_L1_DATA_CACHE_ENABLED);
+	int l1_inst_enabled = get_bits(control, CONTROL_L1_INST_CACHE_ENABLED);
+	int write_buffer_enabled = get_bits(control, CONTROL_WRITE_BUFFER_ENABLED);
+	int high_exception_vectors = get_bits(control, CONTROL_HIGH_EXCEPTION_VECTORS);
+	printf("control register: mmu %s, alignment %s, l1 data %s, "
+	       "l1 instruction %s, writer buffer %s, %s exception vectors\n",
+	       mmu_enabled ? "enabled" : "disabled",
+	       alignment_strict ? "strict" : "not strict",
+	       l1_data_enabled ? "enabled" : "disabled",
+	       l1_inst_enabled ? "enabled" : "disabled",
+	       write_buffer_enabled ? "enabled" : "disabled",
+	       high_exception_vectors ? "high" : "low");
 }
 
 static void print_cpsr_status(void)
