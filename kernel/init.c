@@ -9,7 +9,6 @@
 void c_entry(void)
 {
 	memory_init();
-	jump_to_high_mem();
 	console_init();
 
 	/* start the kernel monitor, which should run forever */

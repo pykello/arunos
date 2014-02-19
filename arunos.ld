@@ -40,7 +40,7 @@ SECTIONS
 
 	. = ALIGN(1024);
 	PROVIDE(page_table = .);
-	. += 0x40000;
+	. += 0x400000;
 
 	PROVIDE(kernel_end = .);
 }
