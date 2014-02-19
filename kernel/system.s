@@ -53,3 +53,23 @@ read_tlb_type:
 read_control_register:
 	mrc p15, 0, r0, cr1, cr0, 0
 	mov pc, lr
+
+.global set_control_register
+set_control_register:
+	mcr p15, 0, r0, cr1, cr0, 0
+	mov pc, lr
+
+.global set_domain_access_control
+set_domain_access_control:
+	mcr p15, 0, r0, cr3, cr0, 0
+	mov pc, lr
+
+.global set_translation_table_base
+set_translation_table_base:
+	mcr p15, 0, r0, cr2, cr0, 0
+	mov pc, lr
+
+.global jump_to_high_mem
+jump_to_high_mem:
+	add lr, #2147483648
+	mov pc, lr

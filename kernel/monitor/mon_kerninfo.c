@@ -5,8 +5,8 @@
 /* mon_kerninfo displays information about the kernel. */
 int mon_kerninfo(int argc, char **argv)
 {
-	extern char entry[], etext[], edata[], end[];
-	int footprint_kb = (end - entry + 1023) / 1024;
+	extern char entry[], etext[], edata[], kernel_end[];
+	int footprint_kb = (kernel_end - entry + 1023) / 1024;
 
 	(void) argc;
 	(void) argv;
@@ -15,7 +15,7 @@ int mon_kerninfo(int argc, char **argv)
 	printf("  entry  %x (phys)\n", entry);
 	printf("  etext  %x (phys)\n", etext);
 	printf("  edata  %x (phys)\n", edata);
-	printf("  end    %x (phys)\n", end);
+	printf("  end    %x (phys)\n", kernel_end);
 	printf("Kernel executable memory footprint: %dKB\n",
 	       footprint_kb);
 

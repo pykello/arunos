@@ -42,7 +42,7 @@ interrupt_table_start:
 	nop
 	nop
 	ldr pc, irq_entry_address
-	irq_entry_address: .word irq_entry
+	irq_entry_address: .word irq_entry + 0x80000000
 interrupt_table_end:
 
 irq_entry: 

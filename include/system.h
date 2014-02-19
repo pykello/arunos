@@ -9,6 +9,8 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#include <types.h>
+
 enum {
 	CPSR_CPU_MODE        = 0x1f,
 	CPSR_INSTRUCTION_SET = 0x1000020,
@@ -110,5 +112,11 @@ int read_cache_type(void);
 int read_tcm_type(void);
 int read_tlb_type(void);
 int read_control_register(void);
+
+void set_control_register(uint32_t v);
+void set_domain_access_control(uint32_t v);
+void set_translation_table_base(uint32_t v);
+
+void jump_to_high_mem(void);
 
 #endif

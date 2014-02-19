@@ -15,8 +15,6 @@ int mon_backtrace(int argc, char **argv)
 
 	(void) argc;
 	(void) argv;
-
-	printf("Stack backtrace:\n");
 	
 	fp = read_fp();
 	pc = fp[0];

@@ -34,5 +34,13 @@ SECTIONS
 	. += 0x1000;
 	irq_stack_start = .;
 
-	PROVIDE(end = .);
+	. = ALIGN(16384);
+	PROVIDE(section_table = .);
+	. += 0x4000;
+
+	. = ALIGN(1024);
+	PROVIDE(page_table = .);
+	. += 0x40000;
+
+	PROVIDE(kernel_end = .);
 }
