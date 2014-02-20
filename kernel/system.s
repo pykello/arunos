@@ -6,6 +6,16 @@ enable_interrupts:
 
 	mov pc, lr
 
+.global use_high_interrupts
+use_high_interrupts:
+	push {lr}
+	bl read_control_register
+	orr r0, #0x2000
+	bl set_control_register
+	pop {lr}
+
+	mov pc, lr
+
 /* get_stack_pointer(cpu_mode) */
 .global get_stack_pointer
 get_stack_pointer:
@@ -71,5 +81,5 @@ set_translation_table_base:
 
 .global jump_to_high_mem
 jump_to_high_mem:
-	add lr, #2147483648
+	add lr, #0x80000000
 	mov pc, lr

@@ -2,9 +2,9 @@ ENTRY(entry)
 
 SECTIONS
 {
-	. = 0x10000;
+	. = 0x80010000;
 
-	.text : { *(.text) }
+	.text : AT(0x10000) { *(.text) }
 	PROVIDE(etext = .);
 
 	.stab : {

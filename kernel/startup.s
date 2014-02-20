@@ -1,12 +1,17 @@
 .global entry
 entry:
+	ldr sp, =kernel_stack_start
+	sub sp, #0x80000000
+	bl memory_init
+	add sp, #0x80000000
+	bl jump_to_high_mem
+
 	bl copy_interrupt_table
+	bl use_high_interrupts
 	bl enable_interrupts
 	bl setup_irq_stack_pointer
-   
-	ldr sp, =kernel_stack_start
 
-	/* jump to c program */
+	bl clean_low_mem
 	bl c_entry
 
 copy_interrupt_table:
@@ -36,13 +41,13 @@ setup_irq_stack_pointer:
 
 interrupt_table_start:
 	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	subs pc, lr, #4
+	subs pc, lr, #4
+	subs pc, lr, #4
+	subs pc, lr, #4
+	subs pc, lr, #4
 	ldr pc, irq_entry_address
-	irq_entry_address: .word irq_entry + 0x80000000
+	irq_entry_address: .word irq_entry
 interrupt_table_end:
 
 irq_entry: 

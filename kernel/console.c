@@ -1,9 +1,10 @@
 #include <console.h>
 #include <irq.h>
 #include <lib/string.h>
+#include <memory.h>
 
 /* memory mapping for the serial port */
-#define UART0 ((volatile unsigned int*)0x101f1000)
+#define UART0 ((volatile unsigned int*) KERNEL_P2V(0x101f1000))
 
 /* serial port interrupt line numbers */
 #define UART0_IRQ 12

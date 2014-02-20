@@ -12,8 +12,8 @@
 #include <types.h>
 
 #define KERNEL_BASE 0x80000000
-#define KERNEL_P2V(x) ((x) + KERNEL_BASE)
-#define KERNEL_V2P(x) ((x) - KERNEL_BASE)
+#define KERNEL_P2V(x) (((uint32_t) x) + KERNEL_BASE)
+#define KERNEL_V2P(x) (((uint32_t) x) - KERNEL_BASE)
 
 #define PAGE_DESC_TYPE_SMALL 2
 #define SECTION_DESC_TYPE_COARSE 1
@@ -43,5 +43,6 @@ struct PageTableEntry {
 };
 
 void memory_init(void);
+void clean_low_mem(void);
 
 #endif
