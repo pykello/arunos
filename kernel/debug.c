@@ -19,7 +19,7 @@ struct DebugInfo get_debug_info(int pc)
 	stab_entry = (struct SymbolTableEntry *) STAB_BEGIN;
 	while (stab_entry != STAB_END) {
 		update_debug_info(&info, stab_entry);
-		if (info.source_line_address >= pc)
+		if ((uint32_t) info.source_line_address >= (uint32_t) pc)
 			break;
 
 		stab_entry++;
@@ -46,7 +46,7 @@ static void update_debug_info(struct DebugInfo *info,
 
 	strlcpy(symbol_name, symbol_str, NAME_MAX_LENGTH);
 	strtok(symbol_name, ":");
-	
+
 	switch (stab_entry->n_type) {
 	case SYMBOL_SOURCE_FILE:
 		strcpy(info->file, symbol_name);
