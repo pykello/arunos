@@ -42,6 +42,10 @@ struct PageTableEntry {
 	unsigned int base_address : 20;
 };
 
+/* section_table and page_table are set in linker script. */
+extern struct SectionTableEntry section_table[];
+extern struct PageTableEntry page_table[];
+
 void memory_init(void);
 void clean_low_mem(void);
 

@@ -15,15 +15,12 @@ void memory_init(void)
 }
 
 void clean_low_mem(void)
-{
-	extern struct PageTableEntry page_table[];
+{	
 	memset(page_table, 0, PAGE_COUNT * 2);
 }
 
 static void setup_section_table(void)
 {
-	extern struct SectionTableEntry section_table[];
-	extern struct PageTableEntry page_table[];
 	struct SectionTableEntry *section_table_physical = NULL;
 	struct PageTableEntry *page_table_physical = NULL;
 
@@ -42,7 +39,6 @@ static void setup_section_table(void)
 
 static void setup_page_table(void)
 {
-	extern struct PageTableEntry page_table[];
 	struct PageTableEntry *page_table_physical = NULL;
 	int i = 0;
 
@@ -67,7 +63,6 @@ static void setup_page_table(void)
 
 static void setup_mmu_registers(void)
 {
-	extern struct SectionTableEntry section_table[];
 	uint32_t control_register = 0;
 
 	set_domain_access_control(1);
