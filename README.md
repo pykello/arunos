@@ -67,9 +67,9 @@ The default GDB doesn't work with ARM binaries, so you need to compile GDB
 manually to be able to debug Arunos. To do this, you can download gdb, then
 configure it for arm-none-eabi target, and then make and install it:
 
-    wget http://ftp.gnu.org/gnu/gdb/gdb-7.6.tar.gz
-    tar -xzf gdb-7.6.tar.gz
-    cd gdb-7.6
+    wget http://ftp.gnu.org/gnu/gdb/gdb-7.7.tar.gz
+    tar -xzf gdb-7.7.tar.gz
+    cd gdb-7.7
     ./configure --target=arm-none-eabi
     make
     sudo make install
