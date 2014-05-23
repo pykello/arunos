@@ -20,9 +20,13 @@
 #define PAGE_INDEX(x) (((uint32_t)x >> 12) & 255)
 #define PAGE_TABLE_TO_BASE(x) ((uint32_t)x >> 10)
 #define BASE_TO_PAGE_TABLE(x) ((void *) ((uint32_t)x << 10))
+#define PAGE_TO_BASE(x) ((uint32_t)x >> 12)
 
 #define P2V(x) (((uint32_t) x) + KERNEL_BASE)
 #define V2P(x) (((uint32_t) x) - KERNEL_BASE)
+
+#define ROUND_DOWN(x,alignment) ((x) & ~(alignment - 1))
+#define ROUND_UP(x,alignment) (((x) + alignment - 1) & ~(alignment - 1))
 
 /* memory layout */
 #define MAX_KERNEL_SIZE 0x1000000
@@ -40,15 +44,9 @@
 #define PAGE_SIZE 4096
 #define SECTION_SIZE (PAGE_SIZE * PAGES_PER_SECTION)
 
-/* memory layout */
-#define USER_LIMIT (KERNEL_BASE - SECTION_SIZE)
-#define USER_VPAGE_TABLE (USER_LIMIT - SECTION_SIZE)
-
 /* descriptor types */
 #define PAGE_DESC 2
 #define SECTION_DESC 1
-#define SECTION_COARSE 1
-#define PAGE_SMALL 2
 
 /* access permissions */
 #define AP_RW_D 0x55
@@ -60,6 +58,10 @@
 #define PAGE_TABLE_SIZE 1024
 #define SECTION_TABLE_SIZE 16384
 
+/* linker symbols */
+extern char kernel_end[];
+
+/* a 32-bit entry in hardware's section table */
 struct SectionTableEntry {
 	unsigned int desc_type : 2;
 	unsigned int : 3;
@@ -68,6 +70,7 @@ struct SectionTableEntry {
 	unsigned int base_address : 22;
 };
 
+/* a 32-bit entry in hardware's page table */
 struct PageTableEntry {
 	unsigned int desc_type : 2;
 	unsigned int bufferable : 1;
@@ -76,6 +79,7 @@ struct PageTableEntry {
 	unsigned int base_address : 20;
 };
 
+/* to hold information about a mapping */
 struct MemoryMapping {
 	uint32_t virtual_address;
 	uint32_t physical_start;
@@ -84,13 +88,8 @@ struct MemoryMapping {
 
 };
 
-struct PhysicalPage {
-	struct PhysicalPage *next;
-	uint16_t reference_count;
-};
-
+/* exported function declarations */
 void memory_init(void);
-void clean_low_mem(void);
 
 #endif
 #endif
