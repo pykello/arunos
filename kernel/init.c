@@ -8,6 +8,7 @@
  */
 void c_entry(void)
 {
+	memory_init();
 	console_init();
 
 	/* start the kernel monitor, which should run forever */

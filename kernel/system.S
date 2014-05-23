@@ -1,3 +1,5 @@
+#include <memory.h>
+
 .global enable_interrupts
 enable_interrupts:
 	mrs r1, cpsr
@@ -81,5 +83,5 @@ set_translation_table_base:
 
 .global jump_to_high_mem
 jump_to_high_mem:
-	add lr, #0x80000000
+	add lr, #KERNEL_BASE
 	mov pc, lr

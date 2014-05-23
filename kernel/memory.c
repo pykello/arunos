@@ -3,72 +3,137 @@
 #include <system.h>
 #include <types.h>
 
-static void setup_section_table(void);
-static void setup_page_table(void);
-static void setup_mmu_registers(void);
+static struct SectionTableEntry *setup_kernel_vm(void);
+static void map_pages(struct SectionTableEntry *vm, struct MemoryMapping *mapping);
+static void map_page(struct SectionTableEntry *vm, uint32_t physical, uint32_t virtual,
+		     int access_permissions);
+static void switch_vm(struct SectionTableEntry *vm);
+static void *boot_alloc(uint32_t n, uint32_t alignment);
+static uint32_t resolve_physical_address(struct SectionTableEntry *vm, uint32_t virtual);
 
+extern char kernel_end[];
+
+struct MemoryMapping kernel_mappings[] = {
+	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_R},
+	{UART0_BASE, UART0_PHYSICAL, UART0_PHYSICAL + PAGE_SIZE, AP_RW_R},
+	{PIC_BASE, PIC_PHYSICAL, PIC_PHYSICAL + PAGE_SIZE, AP_RW_R},
+	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_R}
+};
+
+const int kernel_mapping_count = 4;
+
+/*
+ * memory_init sets up a two level page table. This function only sets
+ * up the kernel part of the address space. The user part of the address
+ * space will be setup later.
+ */
 void memory_init(void)
 {
-	setup_section_table();
-	setup_page_table();
-	setup_mmu_registers();
+	struct SectionTableEntry *kernel_vm = setup_kernel_vm();
+	uint32_t a = resolve_physical_address(kernel_vm, KERNEL_BASE);
+	a = resolve_physical_address(kernel_vm, UART0_BASE);
+	a = resolve_physical_address(kernel_vm, PIC_BASE);
+	switch_vm((struct SectionTableEntry *) V2P(kernel_vm));
 }
 
-void clean_low_mem(void)
-{	
-	memset(page_table, 0, PAGE_COUNT * 2);
-}
-
-static void setup_section_table(void)
+static struct SectionTableEntry *setup_kernel_vm(void)
 {
-	struct SectionTableEntry *section_table_physical = NULL;
-	struct PageTableEntry *page_table_physical = NULL;
-
-	section_table_physical = (struct SectionTableEntry *) KERNEL_V2P(section_table);
-	page_table_physical = (struct PageTableEntry *) KERNEL_V2P(page_table);
-
+	struct SectionTableEntry *kernel_vm = NULL;
 	int i = 0;
-	memset(section_table_physical, 0, SECTION_COUNT * 4);
 
-	for (i = 0; i < SECTION_COUNT; i++) {
-		section_table_physical[i].desc_type = SECTION_DESC_TYPE_COARSE;
-		section_table_physical[i].domain = 0;
-		section_table_physical[i].base_address = ((int) page_table_physical >> 10) + i;
+	/* allocate initial section table */
+	kernel_vm = boot_alloc(SECTION_TABLE_SIZE, SECTION_TABLE_ALIGNMENT);
+	memset(kernel_vm, 0, SECTION_TABLE_SIZE);
+
+	for (i = 0; i < kernel_mapping_count; i++) {
+		struct MemoryMapping *mapping = &kernel_mappings[i];
+		map_pages(kernel_vm, mapping);
+	}
+
+	return kernel_vm;
+}
+
+static void map_pages(struct SectionTableEntry *vm, struct MemoryMapping *mapping)
+{
+	uint32_t physical_current = 0;
+	uint32_t virtual_current = 0;
+
+	uint32_t virtual_start = (mapping->virtual_address) & ~(PAGE_SIZE - 1);
+	uint32_t physical_start = (mapping->physical_start) & ~(PAGE_SIZE - 1);
+	uint32_t physical_end = (mapping->physical_end + PAGE_SIZE - 1) &
+				~(PAGE_SIZE - 1);
+
+	virtual_current = virtual_start;
+	for (physical_current = physical_start; physical_current != physical_end;
+	     physical_current += PAGE_SIZE)
+	{
+		map_page(vm, physical_current, virtual_current,
+			 mapping->access_permissions);
+		virtual_current += PAGE_SIZE;
 	}
 }
 
-static void setup_page_table(void)
+static void map_page(struct SectionTableEntry *vm, uint32_t physical, uint32_t virtual,
+		     int access_permissions)
 {
-	struct PageTableEntry *page_table_physical = NULL;
-	int i = 0;
+	struct PageTableEntry *page_table = NULL;
 
-	page_table_physical = (struct PageTableEntry *) KERNEL_V2P(page_table);
-	memset(page_table_physical, 0, PAGE_COUNT * 4);
+	uint32_t section_index = SECTION_INDEX(virtual);
+	uint32_t page_index = PAGE_INDEX(virtual);
+	uint32_t base_address = vm[section_index].base_address;
 
-	for (i = 0; i < PAGE_COUNT; i++) {
-		page_table_physical[i].desc_type = PAGE_DESC_TYPE_SMALL;
-		page_table_physical[i].bufferable = 0;
-		page_table_physical[i].cacheable = 0;
-		page_table_physical[i].access_permissions_0 = ACCESS_PERMISSION_RW_R;
-		page_table_physical[i].access_permissions_1 = ACCESS_PERMISSION_RW_R;
-		page_table_physical[i].access_permissions_2 = ACCESS_PERMISSION_RW_R;
-		page_table_physical[i].access_permissions_3 = ACCESS_PERMISSION_RW_R;
-
-		if (i < PAGE_COUNT - 16)
-			page_table_physical[i].base_address = i % (PAGE_COUNT / 2);
-		else
-			page_table_physical[i].base_address = i + 16 - PAGE_COUNT;
+	if (base_address == 0) {
+		page_table = boot_alloc(PAGE_TABLE_SIZE, PAGE_TABLE_ALIGNMENT);
+		vm[section_index].base_address = PAGE_TABLE_TO_BASE(V2P(page_table));
+		vm[section_index].desc_type = SECTION_DESC;
+		vm[section_index].domain = 0;
 	}
+	else {
+		page_table = (void *) P2V(BASE_TO_PAGE_TABLE(vm[section_index].base_address));
+	}
+
+	page_table[page_index].desc_type = PAGE_DESC,
+	page_table[page_index].bufferable = 0;
+	page_table[page_index].cacheable = 0;
+	page_table[page_index].access_permissions = access_permissions;
+	page_table[page_index].base_address = (physical >> 12);
 }
 
-static void setup_mmu_registers(void)
+static void switch_vm(struct SectionTableEntry *vm)
 {
-	uint32_t control_register = 0;
+	set_translation_table_base((uint32_t) vm);
+}
 
-	set_domain_access_control(1);
-	set_translation_table_base(KERNEL_V2P(section_table));
+/* physical memory allocator used while setting up virtual memory system. */
+static void *boot_alloc(uint32_t n, uint32_t alignment)
+{
+	char *result = NULL;
+	static char *next_free = NULL;
+	extern char kernel_end[];
 
-	control_register = read_control_register();
-	control_register |= 1;
-	set_control_register(control_register);
+	if (next_free == NULL) {
+		next_free = kernel_end;
+	}
+
+	next_free = (char *) (((uint32_t) next_free + alignment - 1) & ~(alignment - 1));
+	result = next_free;
+	next_free += n;
+
+	return result;
+}
+
+static uint32_t resolve_physical_address(struct SectionTableEntry *vm, uint32_t virtual)
+{
+	struct SectionTableEntry *section = NULL;
+	struct PageTableEntry *page = NULL;
+	uint32_t result = 0;
+	void *base_address = 0;
+
+	section = (void *)((uint32_t) vm | ((virtual >> 20) << 2));
+	base_address = (void *) (section->base_address << 10);
+	page = (void *)((uint32_t)base_address | ((virtual >> 10) & 0x3fc));
+	page = (void *)P2V(page);
+	result = (page->base_address << 12) | (virtual & 0xfff);
+
+	return result;
 }

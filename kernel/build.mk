@@ -5,6 +5,7 @@ OBJS += $(KERNEL_DIR)/debug.o
 OBJS += $(KERNEL_DIR)/init.o
 OBJS += $(KERNEL_DIR)/irq.o
 OBJS += $(KERNEL_DIR)/memory.o
+OBJS += $(KERNEL_DIR)/startup_pagedir.o
 OBJS += $(KERNEL_DIR)/system.o
 
 include $(KERNEL_DIR)/monitor/build.mk
