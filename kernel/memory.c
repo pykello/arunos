@@ -15,10 +15,10 @@ static uint32_t resolve_physical_address(struct SectionTableEntry *vm,
 
 /* kernel virtual to physical memory mappings */
 static struct MemoryMapping kernel_mappings[] = {
-	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_R},
-	{UART0_BASE, UART0_PHYSICAL, UART0_PHYSICAL + PAGE_SIZE, AP_RW_R},
-	{PIC_BASE, PIC_PHYSICAL, PIC_PHYSICAL + PAGE_SIZE, AP_RW_R},
-	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_R}
+	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_D},
+	{UART0_BASE, UART0_PHYSICAL, UART0_PHYSICAL + PAGE_SIZE, AP_RW_D},
+	{PIC_BASE, PIC_PHYSICAL, PIC_PHYSICAL + PAGE_SIZE, AP_RW_D},
+	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_D}
 };
 
 const int kernel_mapping_count = 4;
