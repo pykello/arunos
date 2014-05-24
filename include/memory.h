@@ -28,9 +28,12 @@
 #define ROUND_DOWN(x,alignment) ((x) & ~(alignment - 1))
 #define ROUND_UP(x,alignment) (((x) + alignment - 1) & ~(alignment - 1))
 
+/* linker symbols */
+extern char kernel_end[];
+
 /* memory layout */
-#define MAX_KERNEL_SIZE 0x1000000
-#define UART0_BASE (kernel_end + PAGE_SIZE)
+#define KERNEL_SECTION_TABLE ((uint32_t) kernel_end)
+#define UART0_BASE (KERNEL_SECTION_TABLE + 2 * SECTION_TABLE_SIZE)
 #define PIC_BASE (UART0_BASE + PAGE_SIZE)
 #define ALLOCATABLE_MEMORY_START (PIC_BASE +  PAGE_SIZE)
 #define INTERRUPT_VECTOR_BASE 0xffff0000
@@ -47,6 +50,11 @@
 #define INITIAL_MEMORY_SIZE 0x2000000   /* 32MB  */
 #define TOTAL_MEMORY_SIZE   0x10000000  /* 256MB */
 
+#define PAGE_TABLE_ALIGNMENT 1024
+#define SECTION_TABLE_ALIGNMENT 16384
+#define PAGE_TABLE_SIZE 1024
+#define SECTION_TABLE_SIZE 16384
+
 /* descriptor types */
 #define PAGE_DESC 2
 #define SECTION_DESC 1
@@ -55,14 +63,6 @@
 #define AP_RW_D 0x55
 #define AP_RW_R 0xaa
 #define AP_RW_RW 0xff
-
-#define PAGE_TABLE_ALIGNMENT 1024
-#define SECTION_TABLE_ALIGNMENT 16384
-#define PAGE_TABLE_SIZE 1024
-#define SECTION_TABLE_SIZE 16384
-
-/* linker symbols */
-extern char kernel_end[];
 
 /* a 32-bit entry in hardware's section table */
 struct SectionTableEntry {
@@ -93,6 +93,8 @@ struct MemoryMapping {
 
 /* exported function declarations */
 void memory_init(void);
+uint32_t resolve_physical_address(struct SectionTableEntry *vm,
+				  uint32_t virtual_address);
 
 #endif
 #endif

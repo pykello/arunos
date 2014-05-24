@@ -1,5 +1,6 @@
 #include <memory.h>
 #include <lib/string.h>
+#include <kalloc.h>
 #include <system.h>
 #include <types.h>
 
@@ -9,19 +10,19 @@ static void map_pages(struct SectionTableEntry *vm,
 		      struct MemoryMapping *mapping);
 static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 		     uint32_t virtual, int access_permissions);
-static void *boot_alloc(uint32_t n, uint32_t alignment);
-static uint32_t resolve_physical_address(struct SectionTableEntry *vm,
-					 uint32_t virtual);
+static struct PageTableEntry *allocate_page_table();
 
 /* kernel virtual to physical memory mappings */
 static struct MemoryMapping kernel_mappings[] = {
 	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_D},
 	{UART0_BASE, UART0_PHYSICAL, UART0_PHYSICAL + PAGE_SIZE, AP_RW_D},
 	{PIC_BASE, PIC_PHYSICAL, PIC_PHYSICAL + PAGE_SIZE, AP_RW_D},
-	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_D}
+	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_D},
+	{ALLOCATABLE_MEMORY_START, V2P(ALLOCATABLE_MEMORY_START),
+		TOTAL_MEMORY_SIZE, AP_RW_D}
 };
 
-const int kernel_mapping_count = 4;
+const int kernel_mapping_count = 5;
 
 /*
  * memory_init sets up a two level page table. This function only sets
@@ -31,11 +32,6 @@ const int kernel_mapping_count = 4;
 void memory_init(void)
 {
 	struct SectionTableEntry *kernel_vm = setup_kernel_vm();
-
-	/* for the sake of debugging */
-	uint32_t a = resolve_physical_address(kernel_vm, KERNEL_BASE);
-	a = resolve_physical_address(kernel_vm, UART0_BASE);
-	a = resolve_physical_address(kernel_vm, PIC_BASE);
 
 	/*
 	 * Use physical address of kernel virtual memory as the new virtual
@@ -54,7 +50,8 @@ static struct SectionTableEntry *setup_kernel_vm(void)
 	int i = 0;
 
 	/* allocate initial section table */
-	kernel_vm = boot_alloc(SECTION_TABLE_SIZE, SECTION_TABLE_ALIGNMENT);
+	kernel_vm = (void *) ROUND_UP(KERNEL_SECTION_TABLE,
+				      SECTION_TABLE_ALIGNMENT);
 	memset(kernel_vm, 0, SECTION_TABLE_SIZE);
 
 	/* add each of the mappings */
@@ -104,7 +101,9 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 
 	/* if this section is not mapped before, map it to a new page table */
 	if (vm[section_index].base_address == 0) {
-		page_table = boot_alloc(PAGE_TABLE_SIZE, PAGE_TABLE_ALIGNMENT);
+		page_table = allocate_page_table();
+		memset(page_table, 0, PAGE_TABLE_SIZE);
+
 		vm[section_index].base_address = PAGE_TABLE_TO_BASE(V2P(page_table));
 		vm[section_index].desc_type = SECTION_DESC;
 		vm[section_index].domain = 0;
@@ -122,19 +121,27 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 	page_table[page_index].base_address = PAGE_TO_BASE(physical);
 }
 
-/* physical memory allocator used while setting up virtual memory system. */
-static void *boot_alloc(uint32_t n, uint32_t alignment)
+/*
+ * allocate_page_table. this function assumes page size is an integer multiple
+ * of page table size.
+ */
+static struct PageTableEntry *allocate_page_table()
 {
-	char *result = NULL;
-	static char *next_free = NULL;
+	void *result = NULL;
+	static char *allocated_page = NULL;
+	static int page_offset = 0;
 
-	if (next_free == NULL) {
-		next_free = (char *) ALLOCATABLE_MEMORY_START;
+	/*
+	 * If this is the first call or the previous page is full, allocate
+	 * a new page.
+	 */
+	if (allocated_page == NULL || page_offset == PAGE_SIZE) {
+		allocated_page = kalloc();
+		page_offset = 0;
 	}
 
-	next_free = (char *) ROUND_UP((uint32_t) next_free, alignment);
-	result = next_free;
-	next_free += n;
+	result = allocated_page + page_offset;
+	page_offset += PAGE_TABLE_SIZE;
 
 	return result;
 }
@@ -144,8 +151,7 @@ static void *boot_alloc(uint32_t n, uint32_t alignment)
  * given virtual address to physical address. This function can be used for
  * debugging if given virtual memory is constructed correctly.
  */
-static uint32_t resolve_physical_address(struct SectionTableEntry *vm,
-					 uint32_t virtual)
+uint32_t resolve_physical_address(struct SectionTableEntry *vm, uint32_t virtual)
 {
 	struct SectionTableEntry *section = NULL;
 	struct PageTableEntry *page = NULL;
