@@ -14,7 +14,7 @@ OBJDUMP := arm-none-eabi-objdump
 CFLAGS = -mcpu=$(CPU) -gstabs -I include -marm -std=c99 -pedantic -Wall -Wextra \
          -msoft-float -fPIC -mapcs-frame -fno-builtin-printf -fno-builtin-strcpy
 ASFLAGS = -mcpu=$(CPU) -g -I include
-QEMU_FLAGS = -M versatilepb -cpu arm926 -m 128M -nographic
+QEMU_FLAGS = -M versatilepb -cpu arm926 -m 256M -nographic
 
 OBJS = kernel/startup.o
 

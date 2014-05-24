@@ -1,7 +1,5 @@
 #include <memory.h>
 
-struct PageTableEntry startup_pagetable[256];
-
 __attribute__((__aligned__(SECTION_TABLE_ALIGNMENT)))
 uint32_t startup_sectiontable[4096] = {
 	2 | (2 << 10) | (0 << 20), 2 | (2 << 10) | (1 << 20),

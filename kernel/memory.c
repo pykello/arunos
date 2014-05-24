@@ -129,7 +129,7 @@ static void *boot_alloc(uint32_t n, uint32_t alignment)
 	static char *next_free = NULL;
 
 	if (next_free == NULL) {
-		next_free = kernel_end;
+		next_free = (char *) ALLOCATABLE_MEMORY_START;
 	}
 
 	next_free = (char *) ROUND_UP((uint32_t) next_free, alignment);

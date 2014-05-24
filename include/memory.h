@@ -30,8 +30,9 @@
 
 /* memory layout */
 #define MAX_KERNEL_SIZE 0x1000000
-#define UART0_BASE (KERNEL_BASE + MAX_KERNEL_SIZE)
+#define UART0_BASE (kernel_end + PAGE_SIZE)
 #define PIC_BASE (UART0_BASE + PAGE_SIZE)
+#define ALLOCATABLE_MEMORY_START (PIC_BASE +  PAGE_SIZE)
 #define INTERRUPT_VECTOR_BASE 0xffff0000
 
 /* physical memory */
@@ -43,6 +44,8 @@
 #define SECTION_COUNT 4096
 #define PAGE_SIZE 4096
 #define SECTION_SIZE (PAGE_SIZE * PAGES_PER_SECTION)
+#define INITIAL_MEMORY_SIZE 0x2000000   /* 32MB  */
+#define TOTAL_MEMORY_SIZE   0x10000000  /* 256MB */
 
 /* descriptor types */
 #define PAGE_DESC 2
