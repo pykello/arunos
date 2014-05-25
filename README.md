@@ -23,9 +23,14 @@ I aim to port it to a real Raspberry Pi computer in future.
 Current Status
 --------------
 
-Currently, the OS is able to communicate with serial I/O port uart0, and provides
-a simple shell which have few commands. To see the commands supported, you can
-run "help" in the shell.
+Currently:
+
+ * it boots,
+ * has a simple shell with some utility commands for system information,
+ * communicates with serial I/O port uart0,
+ * uses the virtual memory hardware.
+
+run "help" in the shell to see a list of available commands.
 
 
 Compiling

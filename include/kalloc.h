@@ -1,5 +1,5 @@
 /*
- * memory.h
+ * kalloc.h
  *
  * Type and function declarations for kernel allocator.
  *
