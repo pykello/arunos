@@ -23,6 +23,9 @@ int mon_backtrace(int argc, char **argv)
 		int lr = fp[-1];
 		struct DebugInfo info = get_debug_info(pc);
 
+		if ((int) fp == lr)
+			break;
+
 		printf("  fp: %x, lr: %x\n", fp, lr);
 		printf("    %s:%s:%d\n", info.file, info.function,
 			info.source_line_number);
