@@ -17,12 +17,16 @@ static struct MemoryMapping kernel_mappings[] = {
 	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_D},
 	{UART0_BASE, UART0_PHYSICAL, UART0_PHYSICAL + PAGE_SIZE, AP_RW_D},
 	{PIC_BASE, PIC_PHYSICAL, PIC_PHYSICAL + PAGE_SIZE, AP_RW_D},
+	{GPIO_BASE, GPIO_PHYSICAL, GPIO_PHYSICAL + PAGE_SIZE, AP_RW_D},
 	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_D},
 	{ALLOCATABLE_MEMORY_START, V2P(ALLOCATABLE_MEMORY_START),
 		TOTAL_MEMORY_SIZE, AP_RW_D}
 };
 
-const int kernel_mapping_count = 5;
+const int kernel_mapping_count = 6;
+
+static char *page_table_allocated_page = NULL;
+static int page_table_page_offset = 0;
 
 /*
  * memory_init sets up a two level page table. This function only sets
@@ -31,7 +35,12 @@ const int kernel_mapping_count = 5;
  */
 void memory_init(void)
 {
-	struct SectionTableEntry *kernel_vm = setup_kernel_vm();
+	struct SectionTableEntry *kernel_vm = NULL;
+
+	page_table_allocated_page = NULL;
+	page_table_page_offset = 0;
+
+	kernel_vm = setup_kernel_vm();
 
 	/*
 	 * Use physical address of kernel virtual memory as the new virtual
@@ -103,7 +112,7 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 	if (vm[section_index].base_address == 0) {
 		page_table = allocate_page_table();
 		memset(page_table, 0, PAGE_TABLE_SIZE);
-
+		
 		vm[section_index].base_address = PAGE_TABLE_TO_BASE(V2P(page_table));
 		vm[section_index].desc_type = SECTION_DESC;
 		vm[section_index].domain = 0;
@@ -128,20 +137,18 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 static struct PageTableEntry *allocate_page_table()
 {
 	void *result = NULL;
-	static char *allocated_page = NULL;
-	static int page_offset = 0;
 
 	/*
 	 * If this is the first call or the previous page is full, allocate
 	 * a new page.
 	 */
-	if (allocated_page == NULL || page_offset == PAGE_SIZE) {
-		allocated_page = kalloc();
-		page_offset = 0;
+	if (page_table_allocated_page == NULL || page_table_page_offset == PAGE_SIZE) {
+		page_table_allocated_page = kalloc();
+		page_table_page_offset = 0;
 	}
 
-	result = allocated_page + page_offset;
-	page_offset += PAGE_TABLE_SIZE;
+	result = page_table_allocated_page + page_table_page_offset;
+	page_table_page_offset += PAGE_TABLE_SIZE;
 
 	return result;
 }

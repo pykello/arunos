@@ -13,6 +13,7 @@
 
 #ifndef __ASSEMBLER__
 
+#include <hardware.h>
 #include <types.h>
 
 /* conversion macros */
@@ -33,14 +34,11 @@ extern char kernel_end[];
 
 /* memory layout */
 #define KERNEL_SECTION_TABLE ((uint32_t) kernel_end)
-#define UART0_BASE (KERNEL_SECTION_TABLE + 2 * SECTION_TABLE_SIZE)
-#define PIC_BASE (UART0_BASE + PAGE_SIZE)
-#define ALLOCATABLE_MEMORY_START (PIC_BASE +  PAGE_SIZE)
+#define GPIO_BASE (KERNEL_BASE + 0x40000000)
+#define PIC_BASE (KERNEL_BASE + 0x50000000)
+#define UART0_BASE (KERNEL_BASE + 0x60000000)
+#define ALLOCATABLE_MEMORY_START (KERNEL_SECTION_TABLE +  0x200000)
 #define INTERRUPT_VECTOR_BASE 0xffff0000
-
-/* physical memory */
-#define UART0_PHYSICAL 0x101f1000
-#define PIC_PHYSICAL 0x10140000
 
 /* page table */
 #define PAGES_PER_SECTION 1024
@@ -48,7 +46,6 @@ extern char kernel_end[];
 #define PAGE_SIZE 4096
 #define SECTION_SIZE (PAGE_SIZE * PAGES_PER_SECTION)
 #define INITIAL_MEMORY_SIZE 0x2000000   /* 32MB  */
-#define TOTAL_MEMORY_SIZE   0x10000000  /* 256MB */
 
 #define PAGE_TABLE_ALIGNMENT 1024
 #define SECTION_TABLE_ALIGNMENT 16384

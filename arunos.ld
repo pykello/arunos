@@ -1,10 +1,12 @@
+INCLUDE linker.ld
+
 ENTRY(entry)
 
 SECTIONS
 {
-	. = 0x80010000;
+	. = 0x80000000 + start_address;
 
-	.text : AT(0x10000) { *(.text) }
+	.text : AT(start_address) { *(.text) }
 	PROVIDE(etext = .);
 
 	.stab : {
@@ -33,14 +35,6 @@ SECTIONS
 
 	. += 0x1000;
 	irq_stack_start = .;
-
-	. = ALIGN(16384);
-	PROVIDE(section_table = .);
-	. += 0x4000;
-
-	. = ALIGN(1024);
-	PROVIDE(page_table = .);
-	. += 0x400000;
 
 	PROVIDE(kernel_end = .);
 }

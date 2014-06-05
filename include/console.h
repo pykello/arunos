@@ -9,6 +9,8 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+#include <types.h>
+
 #define MAX_SPECIAL_KEY_SEQ_LEN 6
 
 enum SpecialKey {
@@ -35,7 +37,8 @@ static const struct SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
 	{KEY_ARROW_LEFT,  {0x1b, 0x5b, 0x44, 0x00}},
 
 	/* control keys */
-	{KEY_BACKSPACE,   {0x7f, 0x00}}
+	{KEY_BACKSPACE,   {0x7f, 0x00}},
+	{KEY_BACKSPACE,   {0x08, 0x00}}
 };
 
 #define SPECIAL_KEY_COUNT 5
@@ -44,5 +47,11 @@ static const struct SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
 void console_init(void);
 void putch(int c);
 int getch(void);
+
+/* architecture specific functions */
+void uart_init(void);
+void uart_transmit(char c);
+bool uart_can_receive(void);
+int uart_receive(void);
 
 #endif

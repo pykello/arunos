@@ -1,24 +1,8 @@
 #include <console.h>
+#include <hardware.h>
 #include <irq.h>
 #include <lib/string.h>
 #include <memory.h>
-
-/* memory mapping for the serial port */
-#define UART0 ((volatile unsigned int*) UART0_BASE)
-
-/* serial port interrupt line numbers */
-#define UART0_IRQ 12
-
-/* serial port register offsets */
-#define UART_DATA        0x00 
-#define UART_FLAGS       0x06
-#define UART_INT_ENABLE  0x0e
-#define UART_INT_TARGET  0x0f
-#define UART_INT_CLEAR   0x11
-
-/* serial port bitmasks */
-#define UART_RECEIVE  0x10
-#define UART_TRANSMIT 0x20
 
 /* receive buffer */
 #define RECEIVE_BUFFER_SIZE 16
@@ -27,7 +11,7 @@ static int receive_buffer_head = 0;
 static int receive_buffer_tail = 0;
 
 /* forward declarations for local functions */
-static void uart0_interrupt_handler(void);
+static void uart_interrupt_handler(void);
 static int circular_inc(int operand, int circle_size);
 static bool is_special_key_sequence_prefix(char *sequence);
 static int get_special_key_code(char *sequence);
@@ -42,8 +26,8 @@ void console_init(void)
 	receive_buffer_head = 0;
 	receive_buffer_tail = 0;
 
-	UART0[UART_INT_ENABLE] = UART_RECEIVE;
-	register_interrupt_handler(UART0_IRQ, uart0_interrupt_handler);
+	uart_init();
+	register_interrupt_handler(UART_IRQ, uart_interrupt_handler);
 }
 
 /* putch writes a character to the uart0 serial port. */
@@ -54,6 +38,10 @@ void putch(int c)
 
 	char single_char_sequence[2];
 	char *sequence = get_special_key_sequence(c);
+
+	if (c == '\n')
+		putch('\r');
+
 	if (sequence == NULL) {
 		sequence = single_char_sequence;
 		sequence[0] = c;
@@ -62,11 +50,7 @@ void putch(int c)
 
 	sequence_length = strlen(sequence);
 	for (i = 0; i < sequence_length; i++) {
-		/* wait until transmit buffer is full */
-		while (UART0[UART_FLAGS] & UART_TRANSMIT);
-
-		/* write the character */
-		UART0[UART_DATA] = sequence[i];
+		uart_transmit(sequence[i]);
 	}
 }
 
@@ -97,14 +81,14 @@ int getch(void)
 }
 
 /*
- * uart0_interrupt_handler reads a character from the uart0 serial port, and
+ * uart_interrupt_handler reads a character from the uart0 serial port, and
  * puts it into receive_buffer. If the buffer is full, the character is ignored.
  */
-static void uart0_interrupt_handler(void)
+static void uart_interrupt_handler(void)
 {
-	while (UART0[UART_INT_TARGET] & UART_RECEIVE) {
+	while (uart_can_receive()) {
 		int receive_buffer_new_head = 0;
-		int data = UART0[UART_DATA];
+		int data = uart_receive();
 
 		receive_buffer_new_head = circular_inc(receive_buffer_head,
 						       RECEIVE_BUFFER_SIZE);

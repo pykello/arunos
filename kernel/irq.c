@@ -1,15 +1,5 @@
 #include <irq.h>
-#include <memory.h>
 
-/* memory mapping for the interrupt controller */
-#define PIC ((volatile unsigned int*) PIC_BASE)
-
-/* interrupt controller register offsets */
-#define PIC_STATUS     0x0
-#define PIC_INT_ENABLE 0x4
-
-/* number of interrupt lines */
-#define IRQ_COUNT 32
 
 /* interrupt handler vector */
 interrupt_handler interrupt_handler_vector[IRQ_COUNT] = {0};
@@ -20,7 +10,7 @@ interrupt_handler interrupt_handler_vector[IRQ_COUNT] = {0};
  */
 void register_interrupt_handler(int interrupt_line, interrupt_handler handler)
 {
-	PIC[PIC_INT_ENABLE] |= (1 << interrupt_line);
+	enable_irq_line(interrupt_line);
 	interrupt_handler_vector[interrupt_line] = handler;
 }
 
@@ -33,13 +23,15 @@ void register_interrupt_handler(int interrupt_line, interrupt_handler handler)
 void dispatch_interrupts(void)
 {
 	interrupt_handler handler = 0;
+	bool pending_irqs[IRQ_COUNT];
+	int i = 0;
 
-	unsigned int irq_status = PIC[PIC_STATUS];
-	int irq_number = 0;
-	while (irq_status >>= 1)
-		irq_number++;
+	get_pending_irqs(pending_irqs);
 
-	handler = interrupt_handler_vector[irq_number];
-	if (handler != 0)
-		handler();
+	for (i = 0; i < IRQ_COUNT; i++)
+		if (pending_irqs[i]) {
+			handler = interrupt_handler_vector[i];
+			if (handler != 0)
+				handler();
+		}
 }
