@@ -41,7 +41,7 @@ static const struct SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
 	{KEY_BACKSPACE,   {0x08, 0x00}}
 };
 
-#define SPECIAL_KEY_COUNT 5
+#define SPECIAL_KEY_COUNT 6
 
 /* function declarations for interfacing with concole */
 void console_init(void);
