@@ -57,13 +57,21 @@ setup_irq_stack_pointer:
 interrupt_table_start:
 	nop
 	subs pc, lr, #4
-	subs pc, lr, #4
+	ldr pc, syscall_entry_address
 	subs pc, lr, #4
 	subs pc, lr, #4
 	subs pc, lr, #4
 	ldr pc, irq_entry_address
+	syscall_entry_address: .word syscall_entry
 	irq_entry_address: .word irq_entry
 interrupt_table_end:
+
+syscall_entry:
+	stmfd r13!, {r0-r12, r14}
+
+	bl handle_syscall
+
+	ldmfd r13!, {r0-r12, pc}^
 
 irq_entry:
 	sub r14, r14, #4

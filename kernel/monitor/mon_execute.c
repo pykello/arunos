@@ -47,6 +47,8 @@ void user_hello()
 	c[5] = '\n';
 	c[6] = '\0';
 
+	__asm__ volatile("swi #2");
+
 	while (c[i])
 		UART0[UART_DATA] = c[i++];
 
