@@ -4,6 +4,8 @@
 static void init_debug_info(struct DebugInfo *info);
 static void update_debug_info(struct DebugInfo *info,
 			      struct SymbolTableEntry *stab_entry);
+static void get_symbol_name(struct SymbolTableEntry *stab_entry,
+							char *symbol_name);
 
 /*
  * get_debug_info returns the debug information for the case when the instruction
@@ -28,6 +30,35 @@ struct DebugInfo get_debug_info(int pc)
 	return info;
 }
 
+void get_function_bounds(const char *name, int *begin, int *end)
+{
+	struct SymbolTableEntry *stab_entry = NULL;
+	char symbol_name[NAME_MAX_LENGTH];
+
+	*begin = *end = -1;
+
+	stab_entry = (struct SymbolTableEntry *) STAB_BEGIN;
+	while (stab_entry != STAB_END) {
+		if (stab_entry->n_type == SYMBOL_FUNCTION) {
+			get_symbol_name(stab_entry, symbol_name);
+
+			if (strcmp(symbol_name, name) == 0) {
+				*begin = stab_entry->n_value;
+			}
+			else if (*begin != -1) {
+				*end = stab_entry->n_value;
+				break;
+			}
+		}
+
+		stab_entry++;
+	}
+
+	if (*begin != -1 && *end == -1) {
+		*end = (int) STAB_END;
+	}
+}
+
 static void init_debug_info(struct DebugInfo *info)
 {
 	info->file[0] = '\0';
@@ -41,11 +72,8 @@ static void init_debug_info(struct DebugInfo *info)
 static void update_debug_info(struct DebugInfo *info,
 			      struct SymbolTableEntry *stab_entry)
 {
-	const char *symbol_str = STABSTR_BEGIN + stab_entry->n_strx;
 	char symbol_name[NAME_MAX_LENGTH];
-
-	strlcpy(symbol_name, symbol_str, NAME_MAX_LENGTH);
-	strtok(symbol_name, ":");
+	get_symbol_name(stab_entry, symbol_name);
 
 	switch (stab_entry->n_type) {
 	case SYMBOL_SOURCE_FILE:
@@ -67,4 +95,12 @@ static void update_debug_info(struct DebugInfo *info,
 		info->source_line_number = stab_entry->n_desc - 1;
 		break;
 	}
+}
+
+static void get_symbol_name(struct SymbolTableEntry *stab_entry,
+							char *symbol_name)
+{
+	const char *symbol_str = STABSTR_BEGIN + stab_entry->n_strx;
+	strlcpy(symbol_name, symbol_str, NAME_MAX_LENGTH);
+	strtok(symbol_name, ":");
 }

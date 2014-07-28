@@ -52,5 +52,6 @@ extern const char STABSTR_BEGIN[];
 extern const char STABSTR_END[];
 
 struct DebugInfo get_debug_info(int pc);
+void get_function_bounds(const char *name, int *begin, int *end);
 
 #endif

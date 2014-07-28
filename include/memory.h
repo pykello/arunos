@@ -33,6 +33,8 @@
 extern char kernel_end[];
 
 /* memory layout */
+#define KERNEL_STACK_BOTTOM (KERNEL_BASE - 2 * PAGE_SIZE)
+#define USER_STACK_BOTTOM (KERNEL_BASE - 3 * PAGE_SIZE)
 #define KERNEL_SECTION_TABLE ((uint32_t) kernel_end)
 #define GPIO_BASE (KERNEL_BASE + 0x40000000)
 #define PIC_BASE (KERNEL_BASE + 0x50000000)
@@ -92,6 +94,8 @@ struct MemoryMapping {
 void memory_init(void);
 uint32_t resolve_physical_address(struct SectionTableEntry *vm,
 				  uint32_t virtual_address);
+void setup_kernel_vm(struct SectionTableEntry *kernel_vm);
+void map_pages(struct SectionTableEntry *vm, struct MemoryMapping mapping);
 
 #endif
 #endif

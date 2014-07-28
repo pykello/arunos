@@ -5,9 +5,6 @@
 #include <types.h>
 
 /* forward declarations for local functions */
-static struct SectionTableEntry *setup_kernel_vm(void);
-static void map_pages(struct SectionTableEntry *vm,
-		      struct MemoryMapping *mapping);
 static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 		     uint32_t virtual, int access_permissions);
 static struct PageTableEntry *allocate_page_table();
@@ -40,7 +37,9 @@ void memory_init(void)
 	page_table_allocated_page = NULL;
 	page_table_page_offset = 0;
 
-	kernel_vm = setup_kernel_vm();
+	kernel_vm = (void *) ROUND_UP(KERNEL_SECTION_TABLE,
+				      SECTION_TABLE_ALIGNMENT);
+	setup_kernel_vm(kernel_vm);
 
 	/*
 	 * Use physical address of kernel virtual memory as the new virtual
@@ -53,37 +52,28 @@ void memory_init(void)
  * setup_kernel_vm allocates and creates the kernel virtual memory and returns
  * a pointer to it. This function doesn't activate the virtual memory though.
  */
-static struct SectionTableEntry *setup_kernel_vm(void)
+void setup_kernel_vm(struct SectionTableEntry *kernel_vm)
 {
-	struct SectionTableEntry *kernel_vm = NULL;
 	int i = 0;
-
-	/* allocate initial section table */
-	kernel_vm = (void *) ROUND_UP(KERNEL_SECTION_TABLE,
-				      SECTION_TABLE_ALIGNMENT);
 	memset(kernel_vm, 0, SECTION_TABLE_SIZE);
 
 	/* add each of the mappings */
-	for (i = 0; i < kernel_mapping_count; i++) {
-		struct MemoryMapping *mapping = &kernel_mappings[i];
-		map_pages(kernel_vm, mapping);
-	}
-
-	return kernel_vm;
+	for (i = 0; i < kernel_mapping_count; i++)
+		map_pages(kernel_vm, kernel_mappings[i]);
 }
 
 /*
  * map_pages adds the given virtual to physical memory mapping to the given
  * virtual memory. A mapping can map multiple pages.
  */
-static void map_pages(struct SectionTableEntry *vm, struct MemoryMapping *mapping)
+void map_pages(struct SectionTableEntry *vm, struct MemoryMapping mapping)
 {
 	uint32_t physical_current = 0;
 	uint32_t virtual_current = 0;
 
-	uint32_t virtual_start = ROUND_DOWN(mapping->virtual_address, PAGE_SIZE);
-	uint32_t physical_start = ROUND_DOWN(mapping->physical_start, PAGE_SIZE);
-	uint32_t physical_end = ROUND_UP(mapping->physical_end, PAGE_SIZE);
+	uint32_t virtual_start = ROUND_DOWN(mapping.virtual_address, PAGE_SIZE);
+	uint32_t physical_start = ROUND_DOWN(mapping.physical_start, PAGE_SIZE);
+	uint32_t physical_end = ROUND_UP(mapping.physical_end, PAGE_SIZE);
 
 	/* iterate over pages and map each page */
 	virtual_current = virtual_start;
@@ -91,7 +81,7 @@ static void map_pages(struct SectionTableEntry *vm, struct MemoryMapping *mappin
 	     physical_current += PAGE_SIZE)
 	{
 		map_page(vm, physical_current, virtual_current,
-			 mapping->access_permissions);
+			 mapping.access_permissions);
 		virtual_current += PAGE_SIZE;
 	}
 }

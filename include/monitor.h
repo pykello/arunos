@@ -29,6 +29,7 @@ int mon_help(int argc, char **argv);
 int mon_hextee(int argc, char **argv);
 int mon_kerninfo(int argc, char **argv);
 int mon_status(int argc, char **argv);
+int mon_execute(int argc, char **argv);
 
 /* monitor commands declarations */
 static struct Command const commands[] = {
@@ -52,9 +53,13 @@ static struct Command const commands[] = {
 		"status",
 		"Displays current status of the system", 
 		(command_handler) mon_status
-	},
+	}, {
+		"execute",
+		"Executes a user program",
+		(command_handler) mon_execute
+	}
 };
 
-#define COMMAND_COUNT 5
+#define COMMAND_COUNT 6
 
 #endif
