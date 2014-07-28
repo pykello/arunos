@@ -65,9 +65,10 @@ interrupt_table_start:
 	irq_entry_address: .word irq_entry
 interrupt_table_end:
 
-irq_entry: 
-	push {r0-r12, lr}
-	bl dispatch_interrupts
-	pop {r0-r12, lr}
+irq_entry:
+	sub r14, r14, #4
+	stmfd r13!, {r0-r12, r14}
 
-	subs pc, lr, #4
+	bl dispatch_interrupts
+
+	ldmfd r13!, {r0-r12, pc}^

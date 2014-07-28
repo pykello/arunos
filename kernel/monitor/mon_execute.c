@@ -37,11 +37,18 @@ int mon_execute(int argc, char **argv)
 
 void user_hello()
 {
-	UART0[UART_DATA] = 'h';
-	UART0[UART_DATA] = 'e';
-	UART0[UART_DATA] = 'l';
-	UART0[UART_DATA] = 'l';
-	UART0[UART_DATA] = 'o';
-	UART0[UART_DATA] = '\n';
+	int i = 0;
+	char c[10];
+	c[0] = 'h';
+	c[1] = 'e';
+	c[2] = 'l';
+	c[3] = 'l';
+	c[4] = 'o';
+	c[5] = '\n';
+	c[6] = '\0';
+
+	while (c[i])
+		UART0[UART_DATA] = c[i++];
+
 	while (1);
 }

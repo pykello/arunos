@@ -2,6 +2,7 @@
 #include <memory.h>
 #include <kalloc.h>
 #include <monitor.h>
+#include <proc.h>
 
 /*
  * Kernel starts executing C code here. Before entring this function, some
