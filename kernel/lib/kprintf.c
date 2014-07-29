@@ -2,11 +2,11 @@
 #include <console.h>
 
 /*
- * printf formats and prints the given data. See vsprintf() for the format
+ * kprintf formats and prints the given data. See vsprintf() for the format
  * flags currently supported.
  */
 int
-printf(const char *format, ...)
+kprintf(const char *format, ...)
 {
 	int length = 0;
 	char buffer[BUFFER_MAX_LENGTH];

@@ -1,5 +1,5 @@
 #include <monitor.h>
-#include <lib/stdio.h>
+#include <klib.h>
 #include <lib/string.h>
 #include <system.h>
 #include <types.h>
@@ -39,10 +39,10 @@ static void print_cpu_id(void)
 	int architecture = get_bits(cpu_id, CPU_ID_ARCH_CODE);
 	int part_number = get_bits(cpu_id, CPU_ID_PART_NUMBER);
 
-	printf("cpu: implementor=%s, architecture=%s, part_number=%x\n",
-	       implementor_string[implementor],
-	       architecture_code_string[architecture],
-	       part_number);
+	kprintf("cpu: implementor=%s, architecture=%s, part_number=%x\n",
+	        implementor_string[implementor],
+	        architecture_code_string[architecture],
+	        part_number);
 }
 
 static void print_cache_type(void)
@@ -52,9 +52,9 @@ static void print_cache_type(void)
 	int data_size = get_bits(cache_type, CACHE_TYPE_DATA_SIZE);
 	int instruction_size = get_bits(cache_type, CACHE_TYPE_INSTRUCTION_SIZE);
 
-	printf("cache: type=%s, data_size=%d, instruction_size=%d\n",
-	       separate ? "separate" : "unified",
-	       data_size, instruction_size);
+	kprintf("cache: type=%s, data_size=%d, instruction_size=%d\n",
+		separate ? "separate" : "unified",
+		data_size, instruction_size);
 }
 
 static void print_tcm_type(void)
@@ -63,8 +63,8 @@ static void print_tcm_type(void)
 	int data_count = get_bits(tcm_type, TCM_TYPE_DATA_COUNT);
 	int instruction_count = get_bits(tcm_type, TCM_TYPE_INSTRUCTION_COUNT);
 
-	printf("tightly coupled memory: data_count=%d, instruction_count=%d\n",
-	       data_count, instruction_count);
+	kprintf("tightly coupled memory: data_count=%d, instruction_count=%d\n",
+		data_count, instruction_count);
 }
 
 static void print_tlb_type(void)
@@ -74,9 +74,9 @@ static void print_tlb_type(void)
 	int instruction_locks = get_bits(tlb_type, TLB_TYPE_INSTRUCTION_LOCKS);
 	int data_locks = get_bits(tlb_type, TLB_TYPE_DATA_LOCKS);
 
-	printf("translation lookaside buffers: type=%s, instruction_locks=%d, "
-	       "data_locks=%d\n", separate ? "separate" : "unified",
-	       instruction_locks, data_locks);
+	kprintf("translation lookaside buffers: type=%s, instruction_locks=%d, "
+		"data_locks=%d\n", separate ? "separate" : "unified",
+		instruction_locks, data_locks);
 }
 
 static void print_control_register(void)
@@ -88,14 +88,14 @@ static void print_control_register(void)
 	int l1_inst_enabled = get_bits(control, CONTROL_L1_INST_CACHE_ENABLED);
 	int write_buffer_enabled = get_bits(control, CONTROL_WRITE_BUFFER_ENABLED);
 	int high_exception_vectors = get_bits(control, CONTROL_HIGH_EXCEPTION_VECTORS);
-	printf("control register: mmu %s, alignment %s, l1 data %s, "
-	       "l1 instruction %s, writer buffer %s, %s exception vectors\n",
-	       mmu_enabled ? "enabled" : "disabled",
-	       alignment_strict ? "strict" : "not strict",
-	       l1_data_enabled ? "enabled" : "disabled",
-	       l1_inst_enabled ? "enabled" : "disabled",
-	       write_buffer_enabled ? "enabled" : "disabled",
-	       high_exception_vectors ? "high" : "low");
+	kprintf("control register: mmu %s, alignment %s, l1 data %s, "
+		"l1 instruction %s, writer buffer %s, %s exception vectors\n",
+		mmu_enabled ? "enabled" : "disabled",
+		alignment_strict ? "strict" : "not strict",
+		l1_data_enabled ? "enabled" : "disabled",
+		l1_inst_enabled ? "enabled" : "disabled",
+		write_buffer_enabled ? "enabled" : "disabled",
+		high_exception_vectors ? "high" : "low");
 }
 
 static void print_cpsr_status(void)
@@ -106,29 +106,29 @@ static void print_cpsr_status(void)
 	int irq_disabled = get_bits(cpsr, CPSR_IRQ_DISABLED);
 	int fiq_disabled = get_bits(cpsr, CPSR_FIQ_DISABLED);
 
-	printf("cpsr: cpu_mode=%s, instruction_set=%s, irq=%s, fiq=%s\n",
-	       cpu_mode_string[cpu_mode],
-	       instruction_set_string[instruction_set],
-	       irq_disabled ? "disabled" : "enabled",
-	       fiq_disabled ? "disabled" : "enabled");
+	kprintf("cpsr: cpu_mode=%s, instruction_set=%s, irq=%s, fiq=%s\n",
+		cpu_mode_string[cpu_mode],
+		instruction_set_string[instruction_set],
+		irq_disabled ? "disabled" : "enabled",
+		fiq_disabled ? "disabled" : "enabled");
 }
 
 static void print_supervisor_sp(void)
 {
 	extern char kernel_stack_start[];
 	char *kernel_stack_current = get_stack_pointer(CPU_MODE_SUPERVISOR);
-	printf("supervisor stack pointer: %x (start), %x (current), %x (size)\n",
-	       kernel_stack_start, kernel_stack_current,
-	       kernel_stack_start - kernel_stack_current);
+	kprintf("supervisor stack pointer: %x (start), %x (current), %x (size)\n",
+		kernel_stack_start, kernel_stack_current,
+		kernel_stack_start - kernel_stack_current);
 }
 
 static void print_irq_sp(void)
 {
 	extern char irq_stack_start[];
 	char *irq_stack_current = get_stack_pointer(CPU_MODE_IRQ);
-	printf("irq stack pointer: %x (start), %x (current), %x (size)\n",
-	      irq_stack_start, irq_stack_current,
-	      irq_stack_start - irq_stack_current);
+	kprintf("irq stack pointer: %x (start), %x (current), %x (size)\n",
+		irq_stack_start, irq_stack_current,
+		irq_stack_start - irq_stack_current);
 }
 
 static uint32_t get_bits(uint32_t n, uint32_t bitmask)

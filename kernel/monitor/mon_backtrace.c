@@ -1,7 +1,7 @@
 #include <monitor.h>
 #include <console.h>
 #include <debug.h>
-#include <lib/stdio.h>
+#include <klib.h>
 #include <system.h>
 #include <types.h>
 
@@ -26,8 +26,8 @@ int mon_backtrace(int argc, char **argv)
 		if ((int) fp == lr)
 			break;
 
-		printf("  fp: %x, lr: %x\n", fp, lr);
-		printf("    %s:%s:%d\n", info.file, info.function,
+		kprintf("  fp: %x, lr: %x\n", fp, lr);
+		kprintf("    %s:%s:%d\n", info.file, info.function,
 			info.source_line_number);
 
 		if (info.arg_count != 0)
@@ -44,14 +44,14 @@ static void print_arguments(struct DebugInfo *info, int *fp)
 {
 	int arg_index = 0;
 
-	printf("    arguments: ");
+	kprintf("    arguments: ");
 	for (arg_index = 0; arg_index < info->arg_count; arg_index++) {
 		char *arg_name = info->arg_names[arg_index];
 		int arg_position = info->arg_positions[arg_index];
 		int arg_value = fp[arg_position / 4];
 
-		printf("%s=%d ", arg_name, arg_value);
+		kprintf("%s=%d ", arg_name, arg_value);
 	}
 
-	printf("\n");
+	kprintf("\n");
 }

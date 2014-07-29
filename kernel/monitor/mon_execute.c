@@ -1,8 +1,8 @@
 #include <debug.h>
 #include <monitor.h>
 #include <console.h>
+#include <klib.h>
 #include <lib/base16.h>
-#include <lib/stdio.h>
 #include <lib/string.h>
 #include <proc.h>
 #include <kalloc.h>
@@ -22,7 +22,7 @@ int mon_execute(int argc, char **argv)
 	int len = 0;
 
 	if (argc < 2) {
-		printf("execute requires at least one argument.\n");
+		kprintf("execute requires at least one argument.\n");
 		return -1;
 	}
 
@@ -31,7 +31,7 @@ int mon_execute(int argc, char **argv)
 
 	len = strlen(process_b16);
 	if (len > 2 * PAGE_SIZE) {
-		printf("execution of programs greater than one page"
+		kprintf("execution of programs greater than one page"
 			"is not supported yet.\n");
 		return -1;
 	}

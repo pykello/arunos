@@ -1,4 +1,5 @@
 #include <monitor.h>
+#include <klib.h>
 #include <lib/stdio.h>
 #include <lib/string.h>
 #include <memory.h>
@@ -21,8 +22,8 @@ void monitor(void)
 	while (true) {
 		command_handler handler = NULL;
 		
-		printf("K> ");
-		gets(command_string);
+		kprintf("K> ");
+		kgets(command_string);
 
 		tokenize_command(command_string, &argc, argv);
 		if (argc == 0)
@@ -30,7 +31,7 @@ void monitor(void)
 
 		handler = get_command_handler(argv[0]);
 		if (handler == NULL)
-			printf("command not found.\n");
+			kprintf("command not found.\n");
 		else
 			handler(argc, argv);
 	}

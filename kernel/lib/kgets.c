@@ -3,11 +3,11 @@
 #include <types.h>
 
 /*
- * gets reads a line from the standard input and puts it as a null terminated
+ * kgets reads a line from the standard input and puts it as a null terminated
  * string in the given buffer. It returns the pointer buffer as the return value.
  */
 char *
-gets(char *buffer)
+kgets(char *buffer)
 {
 	int buffer_index = 0;
 	int next_char = 0;

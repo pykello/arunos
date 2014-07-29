@@ -1,5 +1,5 @@
 #include <monitor.h>
-#include <lib/stdio.h>
+#include <klib.h>
 #include <types.h>
 
 /* mon_kerninfo displays information about the kernel. */
@@ -11,13 +11,13 @@ int mon_kerninfo(int argc, char **argv)
 	(void) argc;
 	(void) argv;
 
-	printf("Special kernel symbols:\n");
-	printf("  entry  %x (phys)\n", entry);
-	printf("  etext  %x (phys)\n", etext);
-	printf("  edata  %x (phys)\n", edata);
-	printf("  end    %x (phys)\n", kernel_end);
-	printf("Kernel executable memory footprint: %dKB\n",
-	       footprint_kb);
+	kprintf("Special kernel symbols:\n");
+	kprintf("  entry  %x (phys)\n", entry);
+	kprintf("  etext  %x (phys)\n", etext);
+	kprintf("  edata  %x (phys)\n", edata);
+	kprintf("  end    %x (phys)\n", kernel_end);
+	kprintf("Kernel executable memory footprint: %dKB\n",
+		footprint_kb);
 
 	return 0;
 }
