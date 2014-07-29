@@ -2,11 +2,11 @@
 #include <proc.h>
 #include <kalloc.h>
 #include <lib/string.h>
+#include <lib/stdio.h>
 #include <system.h>
 #include <types.h>
 
 static struct Process process_table[PROCESS_COUNT_MAX];
-
 __attribute__((__aligned__(SECTION_TABLE_ALIGNMENT)))
 struct SectionTableEntry process_vm[PROCESS_COUNT_MAX][4096];
 
@@ -101,11 +101,22 @@ void proc_expand_memory(struct Process *proc, int page_count)
 void proc_load(struct Process *proc, void *start_addr, void *end_addr)
 {
 	char *current_addr = (char *) start_addr;
-	uint32_t vpage = proc->heap_size;
+	uint32_t vpage = 0;
+	uint32_t required_memory = 0;
+
+	struct ElfHeader *header = (struct ElfHeader *) start_addr;
+	proc->entry = (entry_function) header->entry;
+
+	required_memory = ((uint32_t) end_addr - (uint32_t) start_addr);
+	if (required_memory > proc->heap_size) {
+		uint32_t required_pages = required_memory / PAGE_SIZE + 1;
+		uint32_t current_pages = proc->heap_size / PAGE_SIZE;
+
+		proc_expand_memory(proc, required_pages - current_pages);
+	}
 
 	while (current_addr < (char *) end_addr) {
 		char *page = NULL;
-		proc_expand_memory(proc, 1);
 
 		page = (char *) P2V(resolve_physical_address(proc->vm, vpage));
 		memcpy(page, current_addr, PAGE_SIZE);
@@ -118,5 +129,5 @@ void proc_load(struct Process *proc, void *start_addr, void *end_addr)
 void proc_switch(struct Process *proc)
 {
 	set_translation_table_base((uint32_t) V2P(proc->vm));
-	__asm__ volatile("mov pc, #32768");
+	proc->entry();
 }

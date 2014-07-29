@@ -19,7 +19,6 @@ int mon_execute(int argc, char **argv)
 	const char *process_b16 = NULL;
 	int process_len = 0;
 	int program_index = 0;
-	int index = 0;
 	int len = 0;
 
 	if (argc < 2) {
@@ -29,20 +28,18 @@ int mon_execute(int argc, char **argv)
 
 	program_index = argv[1][0] - '0';
 	process_b16 = user_programs[program_index];
-	process_image = kalloc();
+
+	len = strlen(process_b16);
+	if (len > 2 * PAGE_SIZE) {
+		printf("execution of programs greater than one page"
+			"is not supported yet.\n");
+		return -1;
+	}
 
 	proc = proc_create();
-	len = strlen(process_b16);
-	while (index < len) {
-		int part_len = 2048;
-		if (len - index < part_len) part_len = len - index;
-
-		b16decode(process_b16 + index, part_len,
-			  process_image, &process_len);
-		proc_load(proc, process_image, process_image + process_len);
-
-		index += part_len;
-	}
+	process_image = kalloc();
+	b16decode(process_b16, len, process_image, &process_len);
+	proc_load(proc, process_image, process_image + process_len);
 
 	kfree(process_image);
 	proc_switch(proc);
