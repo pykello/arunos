@@ -35,6 +35,8 @@ struct Process {
 	int context[12];
 };
 
+extern struct Process *current_process;
+
 #define ELF_MAGIC 0x464C457FU
 
 struct ElfHeader {

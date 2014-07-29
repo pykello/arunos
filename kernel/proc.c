@@ -10,11 +10,14 @@ static struct Process process_table[PROCESS_COUNT_MAX];
 __attribute__((__aligned__(SECTION_TABLE_ALIGNMENT)))
 struct SectionTableEntry process_vm[PROCESS_COUNT_MAX][4096];
 
+struct Process *current_process = NULL;
+
 void proc_init(void)
 {
 	int i;
 	for (i = 0; i < PROCESS_COUNT_MAX; i++)
 		process_table[i].state = UNUSED;
+	current_process = NULL;
 }
 
 struct Process *proc_create(void)
@@ -128,6 +131,7 @@ void proc_load(struct Process *proc, void *start_addr, void *end_addr)
 
 void proc_switch(struct Process *proc)
 {
+	current_process = proc;
 	set_translation_table_base((uint32_t) V2P(proc->vm));
 	proc->entry();
 }

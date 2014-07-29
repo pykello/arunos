@@ -1,4 +1,5 @@
 #include <lib/stdio.h>
+#include <lib/syscall.h>
 
 #define KERNEL_BASE 0x80000000
 #define UART0_BASE (KERNEL_BASE + 0x60000000)
@@ -7,7 +8,7 @@
 #define UART_FLAGS       0x06
 #define UART_TRANSMIT 0x20
 
-int _start()
+void _start()
 {
 	int i = 0;
 	char c[128];
@@ -18,7 +19,5 @@ int _start()
 
 	UART0[UART_DATA] = '\n';
 
-	while (1);
-
-	return 0;
+	syscall1(SYSCALL_EXIT, 0);
 }

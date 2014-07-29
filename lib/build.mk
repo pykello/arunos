@@ -3,6 +3,7 @@ LIB_DIR = lib
 LIB_OBJS += $(LIB_DIR)/base16.o
 LIB_OBJS += $(LIB_DIR)/math.o
 LIB_OBJS += $(LIB_DIR)/string.o
+LIB_OBJS += $(LIB_DIR)/syscall.o
 
 include $(LIB_DIR)/stdio/build.mk
 
