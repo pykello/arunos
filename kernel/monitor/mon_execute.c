@@ -1,56 +1,51 @@
 #include <debug.h>
 #include <monitor.h>
 #include <console.h>
+#include <lib/base16.h>
 #include <lib/stdio.h>
+#include <lib/string.h>
 #include <proc.h>
+#include <kalloc.h>
 #include <system.h>
 #include <types.h>
 
-#define UART0 ((volatile unsigned int*) UART0_BASE)
-#define UART_DATA        0x00 
-#define UART_FLAGS       0x06
-#define UART_TRANSMIT 0x20
+extern const char *user_programs[];
 
 /* mon_execute. */
 int mon_execute(int argc, char **argv)
 {
-	char *function_name = NULL;
-	int function_begin = -1;
-	int function_end = -1;
 	struct Process *proc = NULL;
+	char *process_image = NULL;
+	const char *process_b16 = NULL;
+	int process_len = 0;
+	int program_index = 0;
+	int index = 0;
+	int len = 0;
 
 	if (argc < 2) {
 		printf("execute requires at least one argument.\n");
 		return -1;
 	}
 
-	function_name = argv[1];
-
-	get_function_bounds(function_name, &function_begin, &function_end);
+	program_index = argv[1][0] - '0';
+	process_b16 = user_programs[program_index];
+	process_image = kalloc();
 
 	proc = proc_create();
-	proc_load(proc, (void *) function_begin, (void *) function_end);
+	len = strlen(process_b16);
+	while (index < len) {
+		int part_len = 2048;
+		if (len - index < part_len) part_len = len - index;
+
+		b16decode(process_b16 + index, part_len,
+			  process_image, &process_len);
+		proc_load(proc, process_image, process_image + process_len);
+
+		index += part_len;
+	}
+
+	kfree(process_image);
 	proc_switch(proc);
 
 	return 0;
-}
-
-void user_hello()
-{
-	int i = 0;
-	char c[10];
-	c[0] = 'h';
-	c[1] = 'e';
-	c[2] = 'l';
-	c[3] = 'l';
-	c[4] = 'o';
-	c[5] = '\n';
-	c[6] = '\0';
-
-	__asm__ volatile("swi #2");
-
-	while (c[i])
-		UART0[UART_DATA] = c[i++];
-
-	while (1);
 }

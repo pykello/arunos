@@ -11,6 +11,11 @@
 
 #include <types.h>
 
+enum SystemCallCode {
+	SYSCALL_PRINT,
+	SYSCALL_EXIT
+};
+
 void handle_syscall(void);
 
 #endif

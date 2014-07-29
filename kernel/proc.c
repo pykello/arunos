@@ -101,18 +101,13 @@ void proc_expand_memory(struct Process *proc, int page_count)
 void proc_load(struct Process *proc, void *start_addr, void *end_addr)
 {
 	char *current_addr = (char *) start_addr;
-	uint32_t vpage = 0;
-	uint32_t required_memory = ((uint32_t) end_addr - (uint32_t) start_addr);
-
-	if (required_memory > proc->heap_size) {
-		uint32_t required_pages = required_memory / PAGE_SIZE + 1;
-		uint32_t current_pages = proc->heap_size / PAGE_SIZE;
-
-		proc_expand_memory(proc, required_pages - current_pages);
-	}
+	uint32_t vpage = proc->heap_size;
 
 	while (current_addr < (char *) end_addr) {
-		char *page = (char *) P2V(resolve_physical_address(proc->vm, vpage));
+		char *page = NULL;
+		proc_expand_memory(proc, 1);
+
+		page = (char *) P2V(resolve_physical_address(proc->vm, vpage));
 		memcpy(page, current_addr, PAGE_SIZE);
 
 		current_addr += PAGE_SIZE;
@@ -123,5 +118,5 @@ void proc_load(struct Process *proc, void *start_addr, void *end_addr)
 void proc_switch(struct Process *proc)
 {
 	set_translation_table_base((uint32_t) V2P(proc->vm));
-	__asm__ volatile("mov pc, #0");
+	__asm__ volatile("mov pc, #32768");
 }

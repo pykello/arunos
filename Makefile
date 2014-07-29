@@ -20,13 +20,14 @@ CFLAGS = -mcpu=$(CPU) -gstabs -I include -I arch/$(arch)/include -marm \
 ASFLAGS = -mcpu=$(CPU) -g -I include -I arch/$(arch)/include
 QEMU_FLAGS = $(ARCH_QEMU_FLAGS) -nographic
 
+all: $(OS).bin
+
 OBJS = kernel/startup.o
 
 include kernel/build.mk
 include lib/build.mk
 include arch/$(arch)/build.mk
-
-all: $(OS).bin
+include user/build.mk
 
 $(OS).bin: $(OBJS) $(OS).ld
 	$(LD) -L arch/$(arch) -T $(OS).ld $(OBJS) -o $(OS).elf
@@ -40,5 +41,5 @@ qemu-gdb: $(OS).bin
 	qemu-system-arm $(QEMU_FLAGS) -gdb tcp::26000 -S -kernel $(OS).bin
 
 clean:
-	rm -f $(OBJS)
+	rm -f $(OBJS) $(EXTRA_CLEAN)
 	rm -f $(OS).elf $(OS).bin $(OS).asm
