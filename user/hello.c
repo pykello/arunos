@@ -1,3 +1,5 @@
+#include <lib/stdio.h>
+
 #define KERNEL_BASE 0x80000000
 #define UART0_BASE (KERNEL_BASE + 0x60000000)
 #define UART0 ((volatile unsigned int*) UART0_BASE)
@@ -8,7 +10,9 @@
 int _start()
 {
 	int i = 0;
-	char c[] = "hello world";
+	char c[128];
+	sprintf(c, "%s %s %d", "hello", "world", 1);
+
 	while (c[i])
 		UART0[UART_DATA] = c[i], i++;
 

@@ -7,6 +7,7 @@ endif
 include arch/$(arch)/config.mk
 
 # tools
+AR = arm-none-eabi-ar
 AS = arm-none-eabi-as
 CC = arm-none-eabi-gcc
 LD = arm-none-eabi-ld
@@ -29,8 +30,8 @@ include lib/build.mk
 include arch/$(arch)/build.mk
 include user/build.mk
 
-$(OS).bin: $(OBJS) $(OS).ld
-	$(LD) -L arch/$(arch) -T $(OS).ld $(OBJS) -o $(OS).elf
+$(OS).bin: $(OBJS) $(OS).ld lib/libarunos.a
+	$(LD) -L arch/$(arch) -T $(OS).ld $(OBJS) lib/libarunos.a -o $(OS).elf
 	$(OBJCOPY) -O binary $(OS).elf $(OS).bin
 	$(OBJDUMP) -D $(OS).elf > $(OS).asm
 

@@ -1,4 +1,4 @@
 STDIO_DIR = lib/stdio
 
-OBJS += $(STDIO_DIR)/sprintf.o
-OBJS += $(STDIO_DIR)/vsprintf.o
+LIB_OBJS += $(STDIO_DIR)/sprintf.o
+LIB_OBJS += $(STDIO_DIR)/vsprintf.o
