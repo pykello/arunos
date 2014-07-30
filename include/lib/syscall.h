@@ -10,7 +10,7 @@
 #define SYSCALL_H
 
 enum SystemCallCode {
-	SYSCALL_PRINT,
+	SYSCALL_PUTCH,
 	SYSCALL_EXIT
 };
 
