@@ -67,11 +67,11 @@ interrupt_table_start:
 interrupt_table_end:
 
 syscall_entry:
-	stmfd r13!, {r0-r12, r14}
+	stmfd r13!, {r1-r12, r14}
 
 	bl handle_syscall
 
-	ldmfd r13!, {r0-r12, pc}^
+	ldmfd r13!, {r1-r12, pc}^
 
 irq_entry:
 	sub r14, r14, #4

@@ -11,10 +11,12 @@
 
 enum SystemCallCode {
 	SYSCALL_PUTCH,
+	SYSCALL_GETCH,
 	SYSCALL_EXIT
 };
 
-void syscall1(enum SystemCallCode code, int arg1);
-void syscall2(enum SystemCallCode code, int arg1, int arg2);
+int syscall0(enum SystemCallCode code);
+int syscall1(enum SystemCallCode code, int arg1);
+int syscall2(enum SystemCallCode code, int arg1, int arg2);
 
 #endif

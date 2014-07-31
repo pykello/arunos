@@ -6,25 +6,28 @@
 #include <proc.h>
 #include <system.h>
 
-static void syscall_exit(int arg1);
-static void syscall_putch(int arg1);
+static int syscall_exit(int arg1);
+static int syscall_putch(int arg1);
+static int syscall_getch(void);
 
 void handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3)
 {
 	switch (code)
 	{
 	case SYSCALL_EXIT:
-		syscall_exit(arg1);
-		break;
+		return syscall_exit(arg1);
 	case SYSCALL_PUTCH:
-		syscall_putch(arg1);
-		break;
+		return syscall_putch(arg1);
+	case SYSCALL_GETCH:
+		return syscall_getch();
 	default:
 		kprintf("handling syscall %d %d %d %d\n", code, arg1, arg2, arg3);
 	}
+
+	return -1;
 }
 
-static void syscall_exit(int arg1)
+static int syscall_exit(int arg1)
 {
 	(void) arg1;
 	if (current_process == NULL)
@@ -35,9 +38,17 @@ static void syscall_exit(int arg1)
 
 	enable_interrupts();
 	monitor();
+
+	return 0;
 }
 
-static void syscall_putch(int arg1)
+static int syscall_putch(int arg1)
 {
 	putch(arg1);
+	return 0;
+}
+
+static int syscall_getch(void)
+{
+	return getch();
 }

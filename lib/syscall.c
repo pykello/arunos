@@ -1,16 +1,38 @@
 #include <lib/syscall.h>
 
-void syscall1(enum SystemCallCode code, int arg1)
+int syscall0(enum SystemCallCode code)
 {
-	(void) code;
-	(void) arg1;
-	__asm__ volatile("swi #1");
+	int result;
+
+	__asm__ volatile("ldr r0, %0" : : "m" (code));
+	__asm__ volatile("swi #0");
+	__asm__ volatile("str r0, %0" : "=m" (result));
+	
+	return result;
 }
 
-void syscall2(enum SystemCallCode code, int arg1, int arg2)
+int syscall1(enum SystemCallCode code, int arg1)
 {
-	(void) code;
-	(void) arg2;
-	__asm__ volatile("swi #2");
+	int result;
+
+	__asm__ volatile("ldr r0, %0" : : "m" (code));
+	__asm__ volatile("ldr r1, %0" : : "m" (arg1));
+	__asm__ volatile("swi #0");
+	__asm__ volatile("str r0, %0" : "=m" (result));
+	
+	return result;
+}
+
+int syscall2(enum SystemCallCode code, int arg1, int arg2)
+{
+	int result;
+
+	__asm__ volatile("ldr r0, %0" : : "m" (code));
+	__asm__ volatile("ldr r1, %0" : : "m" (arg1));
+	__asm__ volatile("ldr r2, %0" : : "m" (arg2));
+	__asm__ volatile("swi #0");
+	__asm__ volatile("str r0, %0" : "=m" (result));
+	
+	return result;
 }
 
