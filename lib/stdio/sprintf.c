@@ -1,6 +1,5 @@
 #include <lib/stdio.h>
 
-
 /*
  * sprintf formats the given data and outputs the result into the given character
  * pointer. See vsprintf for the format flags currently supported.

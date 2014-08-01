@@ -10,7 +10,7 @@ static int syscall_exit(int arg1);
 static int syscall_putch(int arg1);
 static int syscall_getch(void);
 
-void handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3)
+int handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3)
 {
 	switch (code)
 	{
@@ -31,7 +31,7 @@ static int syscall_exit(int arg1)
 {
 	(void) arg1;
 	if (current_process == NULL)
-		return;
+		return -1;
 
 	proc_free(current_process);
 	current_process = NULL;
@@ -44,11 +44,11 @@ static int syscall_exit(int arg1)
 
 static int syscall_putch(int arg1)
 {
-	putch(arg1);
+	kputch(arg1);
 	return 0;
 }
 
 static int syscall_getch(void)
 {
-	return getch();
+	return kgetch();
 }

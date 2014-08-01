@@ -11,5 +11,4 @@ OBJS += $(KERNEL_DIR)/startup_pagedir.o
 OBJS += $(KERNEL_DIR)/ksyscall.o
 OBJS += $(KERNEL_DIR)/system.o
 
-include $(KERNEL_DIR)/lib/build.mk
 include $(KERNEL_DIR)/monitor/build.mk

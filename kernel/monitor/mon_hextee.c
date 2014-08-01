@@ -12,7 +12,7 @@ int mon_hextee(int argc, char **argv)
 	kprintf("press 'q' to exit.\n");
 
 	while (true) {
-		int c = getch();
+		int c = kgetch();
 		if (c == 'q') {
 			kprintf("\n");
 			break;

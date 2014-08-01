@@ -19,4 +19,8 @@ int syscall0(enum SystemCallCode code);
 int syscall1(enum SystemCallCode code, int arg1);
 int syscall2(enum SystemCallCode code, int arg1, int arg2);
 
+void putch(int c);
+int getch(void);
+void exit(int code);
+
 #endif

@@ -45,8 +45,8 @@ static const struct SpecialKeySequence SPECIAL_KEY_SEQUENCES[] = {
 
 /* function declarations for interfacing with concole */
 void console_init(void);
-void putch(int c);
-int getch(void);
+void kputch(int c);
+int kgetch(void);
 
 /* architecture specific functions */
 void uart_init(void);

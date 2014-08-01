@@ -9,7 +9,10 @@
 #ifndef KLIB_H
 #define KLIB_H
 
-char *kgets(char *buffer);
-int kprintf(const char *format, ...);
+#include <lib/stdio.h>
+#include <console.h>
+
+#define kgets(buffer) gets_base(kgetch, kputch, buffer)
+#define kprintf(format, ...) printf_base(kputch, format, ##__VA_ARGS__)
 
 #endif

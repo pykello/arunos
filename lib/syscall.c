@@ -36,3 +36,17 @@ int syscall2(enum SystemCallCode code, int arg1, int arg2)
 	return result;
 }
 
+void putch(int c)
+{
+	syscall1(SYSCALL_PUTCH, c);
+}
+
+int getch(void)
+{
+	return syscall0(SYSCALL_GETCH);
+}
+
+void exit(int code)
+{
+	syscall1(SYSCALL_EXIT, code);
+}

@@ -30,8 +30,8 @@ void console_init(void)
 	register_interrupt_handler(UART_IRQ, uart_interrupt_handler);
 }
 
-/* putch writes a character to the uart0 serial port. */
-void putch(int c)
+/* kputch writes a character to the uart0 serial port. */
+void kputch(int c)
 {
 	int sequence_length = 0;
 	int i = 0;
@@ -40,7 +40,7 @@ void putch(int c)
 	char *sequence = get_special_key_sequence(c);
 
 	if (c == '\n')
-		putch('\r');
+		kputch('\r');
 
 	if (sequence == NULL) {
 		sequence = single_char_sequence;
@@ -55,10 +55,10 @@ void putch(int c)
 }
 
 /*
- * getch reads the next available character from receive_buffer. If the buffer
+ * kgetch reads the next available character from receive_buffer. If the buffer
  * is empty, this function returns 0.
  */
-int getch(void)
+int kgetch(void)
 {
 	int keycode = 0;
 	char sequence[MAX_SPECIAL_KEY_SEQ_LEN] = {0};

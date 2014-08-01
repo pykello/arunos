@@ -1,12 +1,8 @@
 #include <lib/stdio.h>
-#include <console.h>
+#include <lib/syscall.h>
 
-/*
- * kprintf formats and prints the given data. See vsprintf() for the format
- * flags currently supported.
- */
 int
-kprintf(const char *format, ...)
+printf_base(void (*putch)(int), const char *format, ...)
 {
 	int length = 0;
 	char buffer[BUFFER_MAX_LENGTH];
