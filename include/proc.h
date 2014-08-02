@@ -39,6 +39,12 @@ extern struct Process *current_process;
 
 #define ELF_MAGIC 0x464C457FU
 
+enum ElfType {
+	ELFTYPE_NONE        = 0,
+	ELFTYPE_RELOCATABLE = 1,
+	ELFTYPE_EXECUTABLE  = 2
+};
+
 struct ElfHeader {
 	uint32_t magic;
 	char elf[12];
@@ -57,11 +63,22 @@ struct ElfHeader {
 	uint16_t shstrndx;
 };
 
+struct ElfProgramHeader {
+  uint32_t type;
+  uint32_t off;
+  uint32_t vaddr;
+  uint32_t paddr;
+  uint32_t filesz;
+  uint32_t memsz;
+  uint32_t flags;
+  uint32_t align;
+};
+
 void proc_init(void);
 struct Process *proc_create(void);
 void proc_free(struct Process *proc);
 void proc_expand_memory(struct Process *proc, int page_count);
-void proc_load(struct Process *proc, void *start, void *end);
+bool proc_load(struct Process *proc, void *start, void *end);
 void proc_switch(struct Process *proc);
 
 #endif

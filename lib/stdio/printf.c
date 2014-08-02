@@ -16,7 +16,7 @@ printf_base(void (*putch)(int), const char *format, ...)
 	while (buffer[i] != '\0') {
 		putch(buffer[i]);
 		i++;
-	} 
+	}
 
 	return length;
 }

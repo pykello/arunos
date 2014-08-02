@@ -20,6 +20,7 @@ int mon_execute(int argc, char **argv)
 	int process_len = 0;
 	int program_index = 0;
 	int len = 0;
+	bool loaded = false;
 
 	if (argc < 2) {
 		kprintf("execute requires at least one argument.\n");
@@ -39,10 +40,14 @@ int mon_execute(int argc, char **argv)
 	proc = proc_create();
 	process_image = kalloc();
 	b16decode(process_b16, len, process_image, &process_len);
-	proc_load(proc, process_image, process_image + process_len);
-
+	loaded = proc_load(proc, process_image, process_image + process_len);
 	kfree(process_image);
-	proc_switch(proc);
+
+	if (loaded)
+		proc_switch(proc);
+	else {
+		kprintf("couldn't load the process.");
+	}
 
 	return 0;
 }

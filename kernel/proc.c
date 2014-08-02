@@ -101,32 +101,38 @@ void proc_expand_memory(struct Process *proc, int page_count)
 	}
 }
 
-void proc_load(struct Process *proc, void *start_addr, void *end_addr)
+bool proc_load(struct Process *proc, void *start_addr, void *end_addr)
 {
 	char *current_addr = (char *) start_addr;
 	uint32_t vpage = 0;
 	uint32_t required_memory = 0;
+	int prog_header_offset = 0;
+	int prog_header_count = 0;
+	int i = 0;
 
 	struct ElfHeader *header = (struct ElfHeader *) start_addr;
+	if (header->type != ELFTYPE_EXECUTABLE)
+		return false;
+
+	prog_header_offset = header->phoff;
+	prog_header_count = header->phnum;
+
+	for (i = 0; i < prog_header_count; i++) {
+		char *page = NULL;
+		struct ElfProgramHeader *header = (void *) ((char *) start_addr + prog_header_offset);
+
+		while (proc->heap_size < header->vaddr + header->memsz)
+			proc_expand_memory(proc, 1);
+
+		page = (char *) P2V(resolve_physical_address(proc->vm, header->vaddr));
+		memcpy(page, (char *) start_addr + header->off, header->memsz);
+
+		prog_header_offset += sizeof(struct ElfProgramHeader);
+	}
+
 	proc->entry = (entry_function) header->entry;
 
-	required_memory = ((uint32_t) end_addr - (uint32_t) start_addr);
-	if (required_memory > proc->heap_size) {
-		uint32_t required_pages = required_memory / PAGE_SIZE + 1;
-		uint32_t current_pages = proc->heap_size / PAGE_SIZE;
-
-		proc_expand_memory(proc, required_pages - current_pages);
-	}
-
-	while (current_addr < (char *) end_addr) {
-		char *page = NULL;
-
-		page = (char *) P2V(resolve_physical_address(proc->vm, vpage));
-		memcpy(page, current_addr, PAGE_SIZE);
-
-		current_addr += PAGE_SIZE;
-		vpage += PAGE_SIZE;
-	}
+	return true;
 }
 
 void proc_switch(struct Process *proc)
