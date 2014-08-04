@@ -28,7 +28,8 @@ Currently:
  * it boots,
  * has a simple shell with some utility commands for system information,
  * communicates with serial I/O port uart0,
- * uses the virtual memory hardware.
+ * uses the virtual memory hardware,
+ * does some basic memory management and process management.
 
 run "help" in the shell to see a list of available commands.
 
