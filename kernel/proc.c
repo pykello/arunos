@@ -1,6 +1,7 @@
 #include <memory.h>
 #include <proc.h>
 #include <kalloc.h>
+#include <klib.h>
 #include <lib/string.h>
 #include <lib/stdio.h>
 #include <system.h>
@@ -101,31 +102,35 @@ void proc_expand_memory(struct Process *proc, int page_count)
 	}
 }
 
-bool proc_load(struct Process *proc, void *start_addr, void *end_addr)
+bool proc_load(struct Process *proc, char **proc_image, int page_count)
 {
-	char *current_addr = (char *) start_addr;
-	uint32_t vpage = 0;
-	uint32_t required_memory = 0;
 	int prog_header_offset = 0;
 	int prog_header_count = 0;
 	int i = 0;
 
-	struct ElfHeader *header = (struct ElfHeader *) start_addr;
+	struct ElfHeader *header = (struct ElfHeader *) proc_image[0];
 	if (header->type != ELFTYPE_EXECUTABLE)
 		return false;
+
+	(void) page_count;
 
 	prog_header_offset = header->phoff;
 	prog_header_count = header->phnum;
 
 	for (i = 0; i < prog_header_count; i++) {
-		char *page = NULL;
-		struct ElfProgramHeader *header = (void *) ((char *) start_addr + prog_header_offset);
+		uint32_t j = 0;
+		struct ElfProgramHeader *header = (void *) (proc_image[0] + prog_header_offset);
 
 		while (proc->heap_size < header->vaddr + header->memsz)
 			proc_expand_memory(proc, 1);
 
-		page = (char *) P2V(resolve_physical_address(proc->vm, header->vaddr));
-		memcpy(page, (char *) start_addr + header->off, header->memsz);
+		for (j = 0; j < header->memsz; j++) {
+			int vaddr = header->vaddr + j;
+			int paddr = resolve_physical_address(proc->vm, vaddr);
+			char *ptr = (char *) P2V(paddr);
+			int image_off = header->off + j;
+			*ptr = proc_image[image_off / PAGE_SIZE][image_off % PAGE_SIZE];
+		}
 
 		prog_header_offset += sizeof(struct ElfProgramHeader);
 	}

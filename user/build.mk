@@ -5,7 +5,8 @@ USER_CFLAGS = -mcpu=arm1176jz-s -marm -g0 \
          -Iinclude
 
 OBJS += user/user_programs.o
-EXTRA_CLEAN += user/hello user/base16 user/user_programs.c
+USER_PROGRAMS = user/hello
+EXTRA_CLEAN += $(USER_PROGRAMS) user/base16 user/user_programs.c
 
 user/%: user/%.c lib/libarunos.a
 	$(USER_CC) $(USER_CFLAGS) -c -o $@.o $<
@@ -17,6 +18,8 @@ user/base16: user/base16.c
 
 user/user_programs.c: user/base16 user/hello 
 	rm -f $@
-	echo "const char *user_programs[] = {" >> $@
-	user/base16 < user/hello >> $@
-	echo "};" >> $@
+	echo "const char *user_programs[][1024] = {" >> $@
+	for program in $(USER_PROGRAMS); do \
+		user/base16 < $$program >> $@; \
+	done
+	echo "{0}};" >> $@

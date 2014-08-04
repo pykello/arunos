@@ -13,6 +13,6 @@
 #include <console.h>
 
 #define kgets(buffer) gets_base(kgetch, kputch, buffer)
-#define kprintf(format, ...) printf_base(kputch, format, ##__VA_ARGS__)
+#define kprintf(...) printf_base(kputch, ##__VA_ARGS__)
 
 #endif

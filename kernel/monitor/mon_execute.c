@@ -9,17 +9,19 @@
 #include <system.h>
 #include <types.h>
 
-extern const char *user_programs[];
+static void load_process_image(const char **program, char ***image,
+			       int *image_page_count);
+static void free_process_image(char **image, int image_page_count);
+
+extern const char *user_programs[][1024];
 
 /* mon_execute. */
 int mon_execute(int argc, char **argv)
 {
 	struct Process *proc = NULL;
-	char *process_image = NULL;
-	const char *process_b16 = NULL;
-	int process_len = 0;
+	char **process_image = NULL;
+	int process_image_page_count = 0;
 	int program_index = 0;
-	int len = 0;
 	bool loaded = false;
 
 	if (argc < 2) {
@@ -28,26 +30,42 @@ int mon_execute(int argc, char **argv)
 	}
 
 	program_index = argv[1][0] - '0';
-	process_b16 = user_programs[program_index];
-
-	len = strlen(process_b16);
-	if (len > 2 * PAGE_SIZE) {
-		kprintf("execution of programs greater than one page"
-			"is not supported yet.\n");
-		return -1;
-	}
+	load_process_image(user_programs[program_index], &process_image,
+			   &process_image_page_count);
 
 	proc = proc_create();
-	process_image = kalloc();
-	b16decode(process_b16, len, process_image, &process_len);
-	loaded = proc_load(proc, process_image, process_image + process_len);
-	kfree(process_image);
+	loaded = proc_load(proc, process_image, process_image_page_count);
+	free_process_image(process_image, process_image_page_count);
 
 	if (loaded)
 		proc_switch(proc);
 	else {
-		kprintf("couldn't load the process.");
+		kprintf("couldn't load the process.\n");
 	}
 
 	return 0;
+}
+
+static void load_process_image(const char **program, char ***image,
+			       int *image_page_count)
+{
+	int i = 0;
+	(*image) = kalloc();
+
+	for (i = 0; program[i]; i++) {
+		int len = 0;
+		(*image)[i] = kalloc();
+		b16decode(program[i], strlen(program[i]),
+			  (*image)[i], &len);
+
+		(*image_page_count) = i + 1;
+	}
+}
+
+static void free_process_image(char **image, int image_page_count)
+{
+	int i = 0;
+	for (i = 0; i < image_page_count; i++)
+		kfree(image[i]);
+	kfree(image);
 }

@@ -3,14 +3,12 @@
 
 void _start()
 {
-	char c = 0;
+	char s[128];
 	printf("%s %s %d\n", "hello", "world", 1);
 
-	while (c != 'q') {
-		c = getch();
-		putch(c);
-	}
-	putch('\n');
+	printf("Please enter a string: ");
+	gets(s);
+	printf("%s\n", s);
 
 	exit(0);
 }

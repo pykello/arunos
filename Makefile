@@ -17,7 +17,7 @@ OBJDUMP = arm-none-eabi-objdump
 # flags
 CFLAGS = -mcpu=$(CPU) -gstabs -I include -I arch/$(arch)/include -marm \
          -std=c99 -pedantic -Wall -Wextra -msoft-float -fPIC -mapcs-frame \
-         -fno-builtin-printf -fno-builtin-strcpy
+         -fno-builtin-printf -fno-builtin-strcpy -Wno-overlength-strings
 ASFLAGS = -mcpu=$(CPU) -g -I include -I arch/$(arch)/include
 QEMU_FLAGS = $(ARCH_QEMU_FLAGS) -nographic
 
