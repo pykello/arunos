@@ -20,6 +20,6 @@ int sprintf(char *target, const char *format, ...);
 int vsprintf(char *target, const char *format, va_list ap);
 
 #define gets(buffer) gets_base(getch, putch, buffer)
-#define printf(format, ...) printf_base(putch, format, ##__VA_ARGS__)
+#define printf(...) printf_base(putch, ##__VA_ARGS__)
 
 #endif
