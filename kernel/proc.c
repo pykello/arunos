@@ -144,5 +144,8 @@ void proc_switch(struct Process *proc)
 {
 	current_process = proc;
 	set_translation_table_base((uint32_t) V2P(proc->vm));
-	proc->entry();
+	proc->context[CPSR] = 0x10;
+	proc->context[RESTART_ADDR] = (int) proc->entry;
+	proc->context[SP] = USER_STACK_BOTTOM + PAGE_SIZE;
+	switch_to_context(proc->context);
 }

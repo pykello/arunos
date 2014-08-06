@@ -85,3 +85,11 @@ set_translation_table_base:
 jump_to_high_mem:
 	add lr, #KERNEL_BASE
 	mov pc, lr
+
+.global switch_to_context
+switch_to_context:
+	LDMIA R0!, {R12, R14}
+	MSR SPSR_fsxc, R12
+	LDMIA R0, {R0-R14}^
+	NOP
+	MOVS PC, R14

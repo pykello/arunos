@@ -24,6 +24,12 @@ enum ProcessState {
 	TERMINATED
 };
 
+enum ContextItem {
+	CPSR, RESTART_ADDR,
+	R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12,
+	SP, LR
+};
+
 struct Process {
 	enum ProcessState state;
 	int pid;
@@ -32,7 +38,7 @@ struct Process {
 	uint32_t heap_size;
 	char *user_stack;
 	char *kernel_stack;
-	int context[12];
+	int context[17];
 };
 
 extern struct Process *current_process;

@@ -118,5 +118,6 @@ void set_domain_access_control(uint32_t v);
 void set_translation_table_base(uint32_t v);
 
 void jump_to_high_mem(void);
+void switch_to_context(int *context);
 
 #endif
