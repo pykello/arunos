@@ -19,5 +19,7 @@ struct PageList {
 void kalloc_init(uint32_t start, uint32_t end);
 void *kalloc();
 void kfree(void *page);
+void *kalloc1k();
+void kfree1k(void *page);
 
 #endif

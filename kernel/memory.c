@@ -7,7 +7,6 @@
 /* forward declarations for local functions */
 static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 		     uint32_t virtual, int access_permissions);
-static struct PageTableEntry *allocate_page_table();
 
 /* kernel virtual to physical memory mappings */
 static struct MemoryMapping kernel_mappings[] = {
@@ -22,9 +21,6 @@ static struct MemoryMapping kernel_mappings[] = {
 
 const int kernel_mapping_count = 6;
 
-static char *page_table_allocated_page = NULL;
-static int page_table_page_offset = 0;
-
 /*
  * memory_init sets up a two level page table. This function only sets
  * up the kernel part of the address space. The user part of the address
@@ -33,9 +29,6 @@ static int page_table_page_offset = 0;
 void memory_init(void)
 {
 	struct SectionTableEntry *kernel_vm = NULL;
-
-	page_table_allocated_page = NULL;
-	page_table_page_offset = 0;
 
 	kernel_vm = (void *) ROUND_UP(KERNEL_SECTION_TABLE,
 				      SECTION_TABLE_ALIGNMENT);
@@ -100,7 +93,7 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 
 	/* if this section is not mapped before, map it to a new page table */
 	if (vm[section_index].base_address == 0) {
-		page_table = allocate_page_table();
+		page_table = kalloc1k();
 		memset(page_table, 0, PAGE_TABLE_SIZE);
 		
 		vm[section_index].base_address = PAGE_TABLE_TO_BASE(V2P(page_table));
@@ -118,29 +111,6 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 	page_table[page_index].cacheable = 0;
 	page_table[page_index].access_permissions = access_permissions;
 	page_table[page_index].base_address = PAGE_TO_BASE(physical);
-}
-
-/*
- * allocate_page_table. this function assumes page size is an integer multiple
- * of page table size.
- */
-static struct PageTableEntry *allocate_page_table()
-{
-	void *result = NULL;
-
-	/*
-	 * If this is the first call or the previous page is full, allocate
-	 * a new page.
-	 */
-	if (page_table_allocated_page == NULL || page_table_page_offset == PAGE_SIZE) {
-		page_table_allocated_page = kalloc();
-		page_table_page_offset = 0;
-	}
-
-	result = page_table_allocated_page + page_table_page_offset;
-	page_table_page_offset += PAGE_TABLE_SIZE;
-
-	return result;
 }
 
 /*
