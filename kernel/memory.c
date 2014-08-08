@@ -1,6 +1,7 @@
 #include <memory.h>
 #include <lib/string.h>
 #include <kalloc.h>
+#include <klib.h>
 #include <system.h>
 #include <types.h>
 
@@ -21,6 +22,8 @@ static struct MemoryMapping kernel_mappings[] = {
 
 const int kernel_mapping_count = 6;
 
+struct SectionTableEntry *kernel_vm = NULL;
+
 /*
  * memory_init sets up a two level page table. This function only sets
  * up the kernel part of the address space. The user part of the address
@@ -28,8 +31,6 @@ const int kernel_mapping_count = 6;
  */
 void memory_init(void)
 {
-	struct SectionTableEntry *kernel_vm = NULL;
-
 	kernel_vm = (void *) ROUND_UP(KERNEL_SECTION_TABLE,
 				      SECTION_TABLE_ALIGNMENT);
 	setup_kernel_vm(kernel_vm);
@@ -79,6 +80,17 @@ void map_pages(struct SectionTableEntry *vm, struct MemoryMapping mapping)
 	}
 }
 
+void free_vm_page_tables(struct SectionTableEntry *vm)
+{
+	int i = 0;
+	for (i = 0; i < 4096; i++) {
+		if (vm[i].desc_type != 0) {
+			void *page_table = (void *) P2V(BASE_TO_PAGE_TABLE(vm[i].base_address));
+			kfree1k(page_table);
+		}
+	}
+}
+
 /*
  * map_page adds to the given virtual memory the mapping of a single virtual page
  * to a physical page.
@@ -92,7 +104,7 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 	uint32_t page_index = PAGE_INDEX(virtual);
 
 	/* if this section is not mapped before, map it to a new page table */
-	if (vm[section_index].base_address == 0) {
+	if (vm[section_index].desc_type == 0) {
 		page_table = kalloc1k();
 		memset(page_table, 0, PAGE_TABLE_SIZE);
 		

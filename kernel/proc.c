@@ -73,6 +73,7 @@ void proc_free(struct Process *proc)
 {
 	kfree(proc->kernel_stack);
 	kfree(proc->user_stack);
+	free_vm_page_tables(proc->vm);
 }
 
 void proc_expand_memory(struct Process *proc, int page_count)
