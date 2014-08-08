@@ -71,18 +71,8 @@ struct Process *proc_create(void)
 
 void proc_free(struct Process *proc)
 {
-	uint32_t virtual_addr = 0;
-	uint32_t physical_addr = 0;
-
 	kfree(proc->kernel_stack);
 	kfree(proc->user_stack);
-	
-	while (virtual_addr < proc->heap_size) {
-		physical_addr = resolve_physical_address(proc->vm, virtual_addr);
-		kfree((void *) P2V(physical_addr));
-
-		virtual_addr += PAGE_SIZE;
-	}
 }
 
 void proc_expand_memory(struct Process *proc, int page_count)
