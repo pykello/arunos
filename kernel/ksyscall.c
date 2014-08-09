@@ -1,6 +1,7 @@
 #include <console.h>
 #include <klib.h>
 #include <ksyscall.h>
+#include <lib/string.h>
 #include <lib/syscall.h>
 #include <monitor.h>
 #include <proc.h>
@@ -34,10 +35,10 @@ static int syscall_exit(int arg1)
 		return -1;
 
 	set_translation_table_base((uint32_t) V2P(kernel_vm));
-
 	proc_free(current_process);
 	current_process = NULL;
 
+	__asm__ volatile("ldr sp, =kernel_stack_start");
 	enable_interrupts();
 	monitor();
 
