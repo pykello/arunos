@@ -20,6 +20,9 @@ void kalloc_init(uint32_t start, uint32_t end)
 	char *end_address = (char *) ROUND_DOWN(end, PAGE_SIZE);
 	char *current_page = NULL;
 
+	free_list_4k = NULL;
+	free_list_1k = NULL;
+
 	/* add each of the pages to the free list */
 	for (current_page = start_address; current_page != end_address;
 	     current_page += PAGE_SIZE)

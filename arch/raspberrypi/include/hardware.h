@@ -16,7 +16,7 @@
 
 #define UART_IRQ 29
 
-#define TOTAL_MEMORY_SIZE   0x20000000  /* 512MB */
+#define TOTAL_MEMORY_SIZE   0x1ff00000  /* 511MB */
 
 #endif
  

@@ -10,7 +10,7 @@ EXTRA_CLEAN += $(USER_PROGRAMS) user/base16 user/user_programs.c
 
 user/%: user/%.c lib/libarunos.a
 	$(USER_CC) $(USER_CFLAGS) -c -o $@.o $<
-	$(LD) -Ttext=100 $@.o lib/libarunos.a -o $@
+	$(LD) -Ttext=100000 $@.o lib/libarunos.a -o $@
 	rm -f $@.o
 
 user/base16: user/base16.c
