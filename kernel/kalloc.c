@@ -77,6 +77,27 @@ void kfree1k(void *page)
 	free_list_1k = page_list_prepend(free_list_1k, page);
 }
 
+uint32_t get_free_memory_size(void) {
+	uint32_t result = 0;
+	struct PageList *current_page = NULL;
+
+	/* iterate over free 1k pages */
+	current_page = free_list_1k;
+	while (current_page != NULL) {
+		result += 1024;
+		current_page = current_page->next;
+	}
+
+	/* iterate over free 4k pages */
+	current_page = free_list_4k;
+	while (current_page != NULL) {
+		result += 4096;
+		current_page = current_page->next;
+	}
+
+	return result;
+}
+
 /*
  * page_list_prepend adds the given page to the beginning of the page list
  * and returns the address of the new page list.

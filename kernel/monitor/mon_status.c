@@ -1,4 +1,5 @@
 #include <monitor.h>
+#include <kalloc.h>
 #include <klib.h>
 #include <lib/string.h>
 #include <system.h>
@@ -12,6 +13,7 @@ static void print_control_register(void);
 static void print_cpsr_status(void);
 static void print_supervisor_sp(void);
 static void print_irq_sp(void);
+static void print_free_memory(void);
 static uint32_t get_bits(uint32_t n, uint32_t bitmask);
 
 /* mon_status displays information about the current status of system. */
@@ -28,6 +30,7 @@ int mon_status(int argc, char **argv)
 	print_cpsr_status();
 	print_supervisor_sp();
 	print_irq_sp();
+	print_free_memory();
 
 	return 0;
 }
@@ -129,6 +132,12 @@ static void print_irq_sp(void)
 	kprintf("irq stack pointer: %x (start), %x (current), %x (size)\n",
 		irq_stack_start, irq_stack_current,
 		irq_stack_start - irq_stack_current);
+}
+
+static void print_free_memory(void)
+{
+	uint32_t free_memory_size = get_free_memory_size();
+	kprintf("free memory size: %d (bytes)\n", free_memory_size);
 }
 
 static uint32_t get_bits(uint32_t n, uint32_t bitmask)

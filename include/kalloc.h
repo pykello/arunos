@@ -21,5 +21,6 @@ void *kalloc();
 void kfree(void *page);
 void *kalloc1k();
 void kfree1k(void *page);
+uint32_t get_free_memory_size(void);
 
 #endif

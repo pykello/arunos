@@ -73,6 +73,7 @@ void proc_free(struct Process *proc)
 {
 	kfree(proc->kernel_stack);
 	kfree(proc->user_stack);
+	proc_shrink_memory(proc, proc->heap_size / PAGE_SIZE);
 	free_vm_page_tables(proc->vm);
 }
 
@@ -90,6 +91,24 @@ void proc_expand_memory(struct Process *proc, int page_count)
 		});
 
 		proc->heap_size += PAGE_SIZE;
+	}
+}
+
+void proc_shrink_memory(struct Process *proc, int page_count)
+{
+	int i = 0;
+
+	for (i = 0; i < page_count; i++) {
+		uint32_t virtual_addr = proc->heap_size - PAGE_SIZE;
+		uint32_t physical_addr = resolve_physical_address(proc->vm,
+								  virtual_addr);
+		uint32_t kernel_addr = P2V(physical_addr);
+		kfree((void *) kernel_addr);
+
+		proc->heap_size -= PAGE_SIZE;
+		if (proc->heap_size == 0) {
+			break;
+		}
 	}
 }
 
