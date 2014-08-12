@@ -30,6 +30,10 @@ struct DebugInfo get_debug_info(int pc)
 	return info;
 }
 
+/*
+ * get_function_bounds finds a function with given name and puts its start
+ * and end addresses in the given output arguments.
+ */
 void get_function_bounds(const char *name, int *begin, int *end)
 {
 	struct SymbolTableEntry *stab_entry = NULL;

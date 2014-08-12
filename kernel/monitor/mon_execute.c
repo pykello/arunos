@@ -15,7 +15,10 @@ static void free_process_image(char **image, int image_page_count);
 
 extern const char *user_programs[][1024];
 
-/* mon_execute. */
+/*
+ * mon_execute executes a user program. It gets the index of a user program
+ * and executes it.
+ */
 int mon_execute(int argc, char **argv)
 {
 	struct Process *proc = NULL;
@@ -38,7 +41,7 @@ int mon_execute(int argc, char **argv)
 	free_process_image(process_image, process_image_page_count);
 
 	if (loaded)
-		proc_switch(proc);
+		proc_start(proc);
 	else {
 		kprintf("couldn't load the process.\n");
 	}

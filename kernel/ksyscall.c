@@ -11,6 +11,7 @@ static int syscall_exit(int arg1);
 static int syscall_putch(int arg1);
 static int syscall_getch(void);
 
+/* kernel side of system calls. */
 int handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3)
 {
 	switch (code)

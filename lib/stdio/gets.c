@@ -4,7 +4,7 @@
 #include <types.h>
 
 /*
- * gets_base reads a line from the standard input and puts it as a null terminated
+ * gets_base reads a line from the input and puts it as a null terminated
  * string in the given buffer. It returns the pointer buffer as the return value.
  */
 char *

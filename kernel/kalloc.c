@@ -44,16 +44,21 @@ void *kalloc()
 	return result;
 }
 
-/* kfree adds the given page to the free list. */
+/* kfree adds the given page to the 4k free list. */
 void kfree(void *page)
 {
 	free_list_4k = page_list_prepend(free_list_4k, page);
 }
 
+/* kalloc1k allocates 1k sized and aligned chuncks of memory. */
 void *kalloc1k()
 {
 	void *result = NULL;
 
+	/*
+	 * if we don't have any free 1k chunks, convert a 4k page into four
+	 * 1k chunks.
+	 */
 	if (free_list_1k == NULL) {
 		char *page = kalloc();
 		if (page != NULL) {
@@ -72,11 +77,16 @@ void *kalloc1k()
 	return result;
 }
 
+/* kfree1k adds the given chunk to the 1k free list. */
 void kfree1k(void *page)
 {
 	free_list_1k = page_list_prepend(free_list_1k, page);
 }
 
+/*
+ * get_free_memory_size returns total amount of free memory that can be allocated
+ * by kalloc and kalloc1k.
+ */
 uint32_t get_free_memory_size(void) {
 	uint32_t result = 0;
 	struct PageList *current_page = NULL;

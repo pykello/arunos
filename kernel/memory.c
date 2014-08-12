@@ -137,10 +137,10 @@ uint32_t resolve_physical_address(struct SectionTableEntry *vm, uint32_t virtual
 	uint32_t result = 0;
 	void *base_address = 0;
 
-	section = (void *)((uint32_t) vm | ((virtual >> 20) << 2));
+	section = (void *) ((uint32_t) vm | ((virtual >> 20) << 2));
 	base_address = (void *) (section->base_address << 10);
-	page = (void *)((uint32_t)base_address | ((virtual >> 10) & 0x3fc));
-	page = (void *)P2V(page);
+	page = (void *) ((uint32_t) base_address | ((virtual >> 10) & 0x3fc));
+	page = (void *) P2V(page);
 	result = (page->base_address << 12) | (virtual & 0xfff);
 
 	return result;

@@ -86,6 +86,6 @@ void proc_free(struct Process *proc);
 void proc_expand_memory(struct Process *proc, int page_count);
 void proc_shrink_memory(struct Process *proc, int page_count);
 bool proc_load(struct Process *proc, char **proc_image, int page_count);
-void proc_switch(struct Process *proc);
+void proc_start(struct Process *proc);
 
 #endif

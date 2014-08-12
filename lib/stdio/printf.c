@@ -1,6 +1,10 @@
 #include <lib/stdio.h>
 #include <lib/syscall.h>
 
+/*
+ * printf_base formats and prints the given data. See vsprintf() for the format
+ * flags currently supported.
+ */
 int
 printf_base(void (*putch)(int), const char *format, ...)
 {

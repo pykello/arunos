@@ -13,6 +13,7 @@ struct SectionTableEntry process_vm[PROCESS_COUNT_MAX][4096];
 
 struct Process *current_process = NULL;
 
+/* proc_init initializes the process sub-system. */
 void proc_init(void)
 {
 	int i;
@@ -21,6 +22,7 @@ void proc_init(void)
 	current_process = NULL;
 }
 
+/* proc_creates allocates a new process and returns it. */
 struct Process *proc_create(void)
 {
 	struct Process *proc = NULL;
@@ -69,6 +71,7 @@ struct Process *proc_create(void)
 	return proc;
 }
 
+/* proc_free frees all resources allocated by proc. */
 void proc_free(struct Process *proc)
 {
 	kfree(proc->kernel_stack);
@@ -77,6 +80,7 @@ void proc_free(struct Process *proc)
 	free_vm_page_tables(proc->vm);
 }
 
+/* proc_exapnad_memory expands the heap size of the given process. */
 void proc_expand_memory(struct Process *proc, int page_count)
 {
 	int i = 0;
@@ -94,6 +98,7 @@ void proc_expand_memory(struct Process *proc, int page_count)
 	}
 }
 
+/* proc_shrink_memory shrinks the heap size of the given process. */
 void proc_shrink_memory(struct Process *proc, int page_count)
 {
 	int i = 0;
@@ -112,6 +117,7 @@ void proc_shrink_memory(struct Process *proc, int page_count)
 	}
 }
 
+/* proc_load loads the given ELF process image into the given process. */
 bool proc_load(struct Process *proc, char **proc_image, int page_count)
 {
 	int prog_header_offset = 0;
@@ -131,9 +137,11 @@ bool proc_load(struct Process *proc, char **proc_image, int page_count)
 		uint32_t j = 0;
 		struct ElfProgramHeader *header = (void *) (proc_image[0] + prog_header_offset);
 
+		/* make enough room for this section */
 		while (proc->heap_size < header->vaddr + header->memsz)
 			proc_expand_memory(proc, 1);
 
+		/* copy the section */
 		for (j = 0; j < header->memsz; j++) {
 			int vaddr = header->vaddr + j;
 			int paddr = resolve_physical_address(proc->vm, vaddr);
@@ -150,7 +158,8 @@ bool proc_load(struct Process *proc, char **proc_image, int page_count)
 	return true;
 }
 
-void proc_switch(struct Process *proc)
+/* proc_start starts running the given process. */
+void proc_start(struct Process *proc)
 {
 	current_process = proc;
 	set_translation_table_base((uint32_t) V2P(proc->vm));
