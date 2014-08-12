@@ -11,13 +11,17 @@ I will improve it as I continue studying this course.
 Hardware Support
 ----------------
 
-I test the operating system on [ARM926](http://www.arm.com/products/processors/classic/arm9/arm926.php)
-processor and Versatile Platform Baseboard using [QEMU]
-(http://wiki.qemu.org/Main_Page). I haven't tested it on any real hardware yet.
-The reason for choosing ARM926 and VersatilePB was QEMU's good support for this
-platform.
+I test the operating system on [ARM926][arm926] processor and Versatile Platform
+Baseboard using [QEMU][qemu]. The reason for choosing ARM926 and VersatilePB
+was QEMU's good support for this platform.
 
-I aim to port it to a real Raspberry Pi computer in future.
+This operating system also works on [raspberry pi][raspberrypi]. To install it on
+raspberry pi,
+
+ * Run ```make arch=raspberrypi``` to create ```arunos.bin```,
+ * Assuming that you have already installed Raspbian on the raspberry pi's SD
+   card, replace ```kernel.img``` on the SD card with ```arunos.bin```.
+ * Boot raspberry pi.
 
 
 Current Status
@@ -29,7 +33,7 @@ Currently:
  * has a simple shell with some utility commands for system information,
  * communicates with serial I/O port uart0,
  * uses the virtual memory hardware,
- * does some basic memory management and process management.
+ * does some basic process management and can load user programs.
 
 run "help" in the shell to see a list of available commands.
 
@@ -124,3 +128,7 @@ License
 
 This software is BSD licensed. For more details, see the LICENSE file.
 
+
+[arm926]: http://www.arm.com/products/processors/classic/arm9/arm926.php
+[qemu]: http://wiki.qemu.org/Main_Page
+[raspberrypi]: http://www.raspberrypi.org/
