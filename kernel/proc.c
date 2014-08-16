@@ -87,6 +87,8 @@ void proc_expand_memory(struct Process *proc, int page_count)
 
 	for (i = 0; i < page_count; i++) {
 		char *page = kalloc();
+		memset(page, 0, PAGE_SIZE);
+
 		map_pages(proc->vm, (struct MemoryMapping){
 			proc->heap_size,
 			V2P(page),
@@ -166,5 +168,10 @@ void proc_start(struct Process *proc)
 	proc->context[CPSR] = 0x10;
 	proc->context[RESTART_ADDR] = (int) proc->entry;
 	proc->context[SP] = USER_STACK_BOTTOM + PAGE_SIZE;
+
+	/* clear TLB */
+	__asm__ volatile("mov R4, #0");
+	__asm__ volatile("MCR p15, 0, R4, c8, c7, 0");
+
 	switch_to_context(proc->context);
 }
