@@ -94,11 +94,12 @@ extern struct SectionTableEntry *kernel_vm;
 
 /* exported function declarations */
 void memory_init(void);
-uint32_t resolve_physical_address(struct SectionTableEntry *vm,
-				  uint32_t virtual_address);
 void setup_kernel_vm(struct SectionTableEntry *kernel_vm);
 void map_pages(struct SectionTableEntry *vm, struct MemoryMapping mapping);
 void free_vm_page_tables(struct SectionTableEntry *vm);
+void unmap_page(struct SectionTableEntry *vm, uint32_t virtual_addr);
+uint32_t resolve_physical_address(struct SectionTableEntry *vm,
+				  uint32_t virtual_address);
 
 #endif
 #endif

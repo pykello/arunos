@@ -34,7 +34,7 @@ struct Process *proc_create(void)
 
 	for (i = 0; i < PROCESS_COUNT_MAX; i++)
 		if (process_table[i].state == UNUSED) {
-			pid = i;
+			pid = i + 1;
 			break;
 		}
 
@@ -44,7 +44,9 @@ struct Process *proc_create(void)
 	kernel_stack = kalloc();
 	user_stack = kalloc();
 
-	vm = process_vm[pid];
+	vm = process_vm[pid - 1];
+	memset(vm, 0, SECTION_TABLE_SIZE);
+
 	setup_kernel_vm(vm);
 	map_pages(vm, (struct MemoryMapping){
 		KERNEL_STACK_BOTTOM,
@@ -60,7 +62,7 @@ struct Process *proc_create(void)
 	});
 
 
-	proc = &process_table[pid];
+	proc = &process_table[pid - 1];
 	proc->pid = pid;
 	proc->state = CREATED;
 	proc->vm = vm;
@@ -78,6 +80,7 @@ void proc_free(struct Process *proc)
 	kfree(proc->user_stack);
 	proc_shrink_memory(proc, proc->heap_size / PAGE_SIZE);
 	free_vm_page_tables(proc->vm);
+	proc->state = UNUSED;
 }
 
 /* proc_exapnad_memory expands the heap size of the given process. */
@@ -110,7 +113,9 @@ void proc_shrink_memory(struct Process *proc, int page_count)
 		uint32_t physical_addr = resolve_physical_address(proc->vm,
 								  virtual_addr);
 		uint32_t kernel_addr = P2V(physical_addr);
+
 		kfree((void *) kernel_addr);
+		unmap_page(proc->vm, virtual_addr);
 
 		proc->heap_size -= PAGE_SIZE;
 		if (proc->heap_size == 0) {

@@ -96,12 +96,12 @@ void free_vm_page_tables(struct SectionTableEntry *vm)
  * to a physical page.
  */
 static void map_page(struct SectionTableEntry *vm, uint32_t physical,
-		     uint32_t virtual, int access_permissions)
+		     uint32_t virtual_addr, int access_permissions)
 {
 	struct PageTableEntry *page_table = NULL;
 
-	uint32_t section_index = SECTION_INDEX(virtual);
-	uint32_t page_index = PAGE_INDEX(virtual);
+	uint32_t section_index = SECTION_INDEX(virtual_addr);
+	uint32_t page_index = PAGE_INDEX(virtual_addr);
 
 	/* if this section is not mapped before, map it to a new page table */
 	if (vm[section_index].desc_type == 0) {
@@ -123,6 +123,18 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 	page_table[page_index].cacheable = 0;
 	page_table[page_index].access_permissions = access_permissions;
 	page_table[page_index].base_address = PAGE_TO_BASE(physical);
+}
+
+/* unmap_page clears the mapping for the given virtual address */
+void unmap_page(struct SectionTableEntry *vm, uint32_t virtual_addr)
+{
+	struct PageTableEntry *page_table = NULL;
+
+	uint32_t section_index = SECTION_INDEX(virtual_addr);
+	uint32_t page_index = PAGE_INDEX(virtual_addr);
+
+	page_table = (void *) P2V(BASE_TO_PAGE_TABLE(vm[section_index].base_address));
+	page_table[page_index].desc_type = 0;
 }
 
 /*
