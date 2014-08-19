@@ -11,22 +11,16 @@ static int syscall_exit(int arg1);
 static int syscall_putch(int arg1);
 static int syscall_getch(void);
 
+static int (*const syscall_handler[])() = {
+	[SYSCALL_EXIT] = syscall_exit,
+	[SYSCALL_PUTCH] = syscall_putch,
+	[SYSCALL_GETCH] = syscall_getch
+};
+
 /* kernel side of system calls. */
 int handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3)
 {
-	switch (code)
-	{
-	case SYSCALL_EXIT:
-		return syscall_exit(arg1);
-	case SYSCALL_PUTCH:
-		return syscall_putch(arg1);
-	case SYSCALL_GETCH:
-		return syscall_getch();
-	default:
-		kprintf("handling syscall %d %d %d %d\n", code, arg1, arg2, arg3);
-	}
-
-	return -1;
+	return syscall_handler[code](arg1, arg2, arg3);
 }
 
 static int syscall_exit(int arg1)
