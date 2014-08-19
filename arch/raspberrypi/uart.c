@@ -1,5 +1,5 @@
 #include <console.h>
-#include <memory.h>
+#include <vm.h>
 
 #define GPFSEL1 0x20200004
 #define GPSET0  0x2020001C

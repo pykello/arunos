@@ -9,7 +9,7 @@
 #ifndef PROC_H
 #define PROC_H
 
-#include <memory.h>
+#include <vm.h>
 #include <types.h>
 
 typedef void (*entry_function)(void);

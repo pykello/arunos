@@ -2,7 +2,7 @@
 #include <hardware.h>
 #include <irq.h>
 #include <lib/string.h>
-#include <memory.h>
+#include <vm.h>
 
 /* receive buffer */
 #define RECEIVE_BUFFER_SIZE 16

@@ -1,4 +1,4 @@
-#include <memory.h>
+#include <vm.h>
 #include <proc.h>
 #include <kalloc.h>
 #include <klib.h>

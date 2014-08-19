@@ -1,5 +1,5 @@
 #include <console.h>
-#include <memory.h>
+#include <vm.h>
 
 /* memory mapping for the serial port */
 #define UART0 ((volatile unsigned int*) UART0_BASE)

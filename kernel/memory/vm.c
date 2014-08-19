@@ -1,4 +1,4 @@
-#include <memory.h>
+#include <vm.h>
 #include <lib/string.h>
 #include <kalloc.h>
 #include <klib.h>
@@ -25,11 +25,11 @@ const int kernel_mapping_count = 6;
 struct SectionTableEntry *kernel_vm = NULL;
 
 /*
- * memory_init sets up a two level page table. This function only sets
+ * vm_init sets up a two level page table. This function only sets
  * up the kernel part of the address space. The user part of the address
  * space will be setup later.
  */
-void memory_init(void)
+void vm_init(void)
 {
 	kernel_vm = (void *) ROUND_UP(KERNEL_SECTION_TABLE,
 				      SECTION_TABLE_ALIGNMENT);

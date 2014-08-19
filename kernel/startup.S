@@ -1,4 +1,4 @@
-#include <memory.h>
+#include <vm.h>
 
 .global entry
 entry:

@@ -1,5 +1,5 @@
 #include <console.h>
-#include <memory.h>
+#include <vm.h>
 #include <kalloc.h>
 #include <monitor.h>
 #include <proc.h>
@@ -12,7 +12,7 @@ void c_entry(void)
 {
 	kalloc_init(ALLOCATABLE_MEMORY_START,
 		    KERNEL_BASE + INITIAL_MEMORY_SIZE);
-	memory_init();
+	vm_init();
 	proc_init();
 	console_init();
 	kalloc_init(KERNEL_BASE + INITIAL_MEMORY_SIZE,

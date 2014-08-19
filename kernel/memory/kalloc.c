@@ -1,5 +1,5 @@
 #include <kalloc.h>
-#include <memory.h>
+#include <vm.h>
 #include <types.h>
 
 static struct PageList *page_list_prepend(struct PageList *page_list,

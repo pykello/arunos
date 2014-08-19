@@ -1,4 +1,4 @@
-#include <memory.h>
+#include <vm.h>
 
 .global enable_interrupts
 enable_interrupts:

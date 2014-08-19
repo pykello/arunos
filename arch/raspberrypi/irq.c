@@ -1,5 +1,5 @@
 #include <irq.h>
-#include <memory.h>
+#include <vm.h>
 #include <lib/string.h>
 
 /* memory mapping for the interrupt controller */

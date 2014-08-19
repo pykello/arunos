@@ -1,7 +1,7 @@
 /*
- * memory.h
+ * vm.h
  *
- * Type and function declarations for memory management.
+ * Type and function declarations for virtual memory management.
  *
  * (c) 2014 Hadi Moshayedi <hadi@moshayedi.net>
  */
@@ -93,7 +93,7 @@ struct MemoryMapping {
 extern struct SectionTableEntry *kernel_vm;
 
 /* exported function declarations */
-void memory_init(void);
+void vm_init(void);
 void setup_kernel_vm(struct SectionTableEntry *kernel_vm);
 void map_pages(struct SectionTableEntry *vm, struct MemoryMapping mapping);
 void free_vm_page_tables(struct SectionTableEntry *vm);

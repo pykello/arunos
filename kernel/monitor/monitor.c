@@ -2,7 +2,6 @@
 #include <klib.h>
 #include <lib/stdio.h>
 #include <lib/string.h>
-#include <memory.h>
 #include <types.h>
 
 /* forward declarations for local functions */
