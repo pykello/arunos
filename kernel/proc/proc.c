@@ -7,7 +7,7 @@
 #include <system.h>
 #include <types.h>
 
-static struct Process process_table[PROCESS_COUNT_MAX];
+struct Process process_table[PROCESS_COUNT_MAX];
 __attribute__((__aligned__(SECTION_TABLE_ALIGNMENT)))
 struct SectionTableEntry process_vm[PROCESS_COUNT_MAX][4096];
 

@@ -41,8 +41,6 @@ struct Process {
 	int context[17];
 };
 
-extern struct Process *current_process;
-
 #define ELF_MAGIC 0x464C457FU
 
 enum ElfType {
@@ -80,6 +78,11 @@ struct ElfProgramHeader {
   uint32_t align;
 };
 
+/* public symbols */
+extern struct Process *current_process;
+extern struct Process process_table[PROCESS_COUNT_MAX];
+
+/* proc.c */
 void proc_init(void);
 struct Process *proc_create(void);
 void proc_free(struct Process *proc);
@@ -87,6 +90,10 @@ void proc_expand_memory(struct Process *proc, int page_count);
 void proc_shrink_memory(struct Process *proc, int page_count);
 bool proc_load(struct Process *proc, char **proc_image, int page_count);
 void proc_start(struct Process *proc);
+
+/* scheduler.c */
+void scheduler_init(void);
+void schedule(void);
 
 /* system calls */
 int syscall_exit(int arg1);
