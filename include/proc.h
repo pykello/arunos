@@ -88,4 +88,7 @@ void proc_shrink_memory(struct Process *proc, int page_count);
 bool proc_load(struct Process *proc, char **proc_image, int page_count);
 void proc_start(struct Process *proc);
 
+/* system calls */
+int syscall_exit(int arg1);
+
 #endif

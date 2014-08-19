@@ -54,6 +54,12 @@ void kputch(int c)
 	}
 }
 
+int syscall_putch(int c)
+{
+	kputch(c);
+	return 0;
+}
+
 /*
  * kgetch reads the next available character from receive_buffer. If the buffer
  * is empty, this function returns 0.
@@ -78,6 +84,11 @@ int kgetch(void)
 		keycode = sequence[sequence_length - 1];
 
 	return keycode;
+}
+
+int syscall_getch(void)
+{
+	return kgetch();
 }
 
 /*

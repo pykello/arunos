@@ -54,4 +54,8 @@ void uart_transmit(char c);
 bool uart_can_receive(void);
 int uart_receive(void);
 
+/* system calls */
+int syscall_putch(int c);
+int syscall_getch(void);
+
 #endif
