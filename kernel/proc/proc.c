@@ -162,6 +162,11 @@ bool proc_load(struct Process *proc, char **proc_image, int page_count)
 
 	proc->entry = (entry_function) header->entry;
 
+	memset(proc->context, 0, sizeof(proc->context));
+	proc->context[CPSR] = 0x10;
+	proc->context[RESTART_ADDR] = (int) proc->entry;
+	proc->context[SP] = USER_STACK_BOTTOM + PAGE_SIZE;
+
 	return true;
 }
 
@@ -170,9 +175,6 @@ void proc_start(struct Process *proc)
 {
 	current_process = proc;
 	set_translation_table_base((uint32_t) V2P(proc->vm));
-	proc->context[CPSR] = 0x10;
-	proc->context[RESTART_ADDR] = (int) proc->entry;
-	proc->context[SP] = USER_STACK_BOTTOM + PAGE_SIZE;
 
 	/* clear TLB */
 	__asm__ volatile("mov R4, #0");
