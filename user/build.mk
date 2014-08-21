@@ -5,7 +5,7 @@ USER_CFLAGS = -mcpu=arm1176jz-s -marm -g0 \
          -Iinclude
 
 OBJS += user/user_programs.o
-USER_PROGRAMS = user/hello user/fork
+USER_PROGRAMS = user/hello user/fork_test user/exec_test
 EXTRA_CLEAN += $(USER_PROGRAMS) user/base16 user/user_programs.c
 
 user/%: user/%.c lib/libarunos.a

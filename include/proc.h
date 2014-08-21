@@ -95,9 +95,13 @@ void proc_start(struct Process *proc);
 void scheduler_init(void);
 void schedule(void);
 
+/* syscall_exec.c */
+bool proc_load_program(struct Process *proc, int program_index);
+
 /* system calls */
 int syscall_exit(int arg1);
 int syscall_getpid(void);
 int syscall_fork(void);
+int syscall_exec(int id);
 
 #endif

@@ -60,3 +60,8 @@ int fork(void)
 {
 	return syscall0(SYSCALL_FORK);
 }
+
+void exec(int id)
+{
+	syscall1(SYSCALL_EXEC, id);
+}

@@ -7,7 +7,8 @@ static int (*const syscall_handler[])() = {
 	[SYSCALL_PUTCH] = syscall_putch,
 	[SYSCALL_GETCH] = syscall_getch,
 	[SYSCALL_GETPID] = syscall_getpid,
-	[SYSCALL_FORK] = syscall_fork
+	[SYSCALL_FORK] = syscall_fork,
+	[SYSCALL_EXEC] = syscall_exec
 };
 
 /* kernel side of system calls. */
