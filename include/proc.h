@@ -97,5 +97,7 @@ void schedule(void);
 
 /* system calls */
 int syscall_exit(int arg1);
+int syscall_getpid(void);
+int syscall_fork(void);
 
 #endif

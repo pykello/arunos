@@ -1,6 +1,7 @@
 #include <proc.h>
 #include <monitor.h>
 #include <system.h>
+#include <klib.h>
 #include <vm.h>
 
 static int round_robin_index;

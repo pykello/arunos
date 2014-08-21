@@ -12,6 +12,7 @@ __attribute__((__aligned__(SECTION_TABLE_ALIGNMENT)))
 struct SectionTableEntry process_vm[PROCESS_COUNT_MAX][4096];
 
 struct Process *current_process = NULL;
+int *current_context;
 
 /* proc_init initializes the process sub-system. */
 void proc_init(void)
@@ -161,6 +162,7 @@ bool proc_load(struct Process *proc, char **proc_image, int page_count)
 	}
 
 	proc->entry = (entry_function) header->entry;
+	proc->state = READY;
 
 	memset(proc->context, 0, sizeof(proc->context));
 	proc->context[CPSR] = 0x10;
@@ -174,6 +176,8 @@ bool proc_load(struct Process *proc, char **proc_image, int page_count)
 void proc_start(struct Process *proc)
 {
 	current_process = proc;
+	current_context = proc->context;
+
 	set_translation_table_base((uint32_t) V2P(proc->vm));
 
 	/* clear TLB */

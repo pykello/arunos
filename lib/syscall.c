@@ -50,3 +50,13 @@ void exit(int code)
 {
 	syscall1(SYSCALL_EXIT, code);
 }
+
+int getpid(void)
+{
+	return syscall0(SYSCALL_GETPID);
+}
+
+int fork(void)
+{
+	return syscall0(SYSCALL_FORK);
+}
