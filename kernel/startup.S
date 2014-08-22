@@ -1,4 +1,5 @@
 #include <vm.h>
+#include <proc.h>
 
 .global entry
 entry:
@@ -67,35 +68,18 @@ interrupt_table_start:
 interrupt_table_end:
 
 syscall_entry:
+	SAVE_CONTEXT
+
 	stmfd r13!, {r1-r12, r14}
-
-	push {r0-r12, r14}
-	
-	ldr r0, current_context_address
-	ldr r0, [r0]
-
-	push {r1}
-	mrs r1, spsr
-	str r1, [r0]
-	pop {r1}
-
-	add r0, #4
-	str r14, [r0]
-
-	add r0, #8
-	stmia r0, {r1-r14}^
-
-	pop {r0-r12, r14}
 
 	bl handle_syscall
 
 	ldmfd r13!, {r1-r12, pc}^
 
-
-current_context_address: .word current_context
-
 irq_entry:
 	sub r14, r14, #4
+	SAVE_CONTEXT
+
 	stmfd r13!, {r0-r12, r14}
 
 	bl dispatch_interrupts

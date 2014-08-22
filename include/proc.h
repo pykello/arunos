@@ -9,6 +9,16 @@
 #ifndef PROC_H
 #define PROC_H
 
+#ifdef __ASSEMBLER__
+
+#define SAVE_CONTEXT \
+	push {r0, r14};\
+	mov r0, lr;\
+	bl save_context;\
+	pop {r0, r14};
+
+#else
+
 #include <vm.h>
 #include <types.h>
 
@@ -90,6 +100,8 @@ void proc_expand_memory(struct Process *proc, int page_count);
 void proc_shrink_memory(struct Process *proc, int page_count);
 bool proc_load(struct Process *proc, char **proc_image, int page_count);
 void proc_start(struct Process *proc);
+void set_current_process(struct Process *proc);
+int *get_current_context(void);
 
 /* scheduler.c */
 void scheduler_init(void);
@@ -104,4 +116,5 @@ int syscall_getpid(void);
 int syscall_fork(void);
 int syscall_exec(int id);
 
+#endif
 #endif
