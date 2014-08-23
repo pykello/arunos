@@ -31,25 +31,12 @@
 #define IRQ_DISABLE2 0x2000B220
 #define IRQ_DISABLE_BASIC 0x2000B224
 
-static uint32_t physical_to_virtual(uint32_t v) {
-	if (v >= UART0_PHYSICAL && v < UART0_PHYSICAL + PAGE_SIZE) {
-		return v - UART0_PHYSICAL + UART0_BASE;
-	}
-	if (v >= GPIO_PHYSICAL && v < GPIO_PHYSICAL + PAGE_SIZE) {
-		return v - GPIO_PHYSICAL + GPIO_BASE;
-	}
-	if (v >= PIC_PHYSICAL && v < PIC_PHYSICAL + PAGE_SIZE) {
-		return v - PIC_PHYSICAL + PIC_BASE;
-	}
-	return 0;
-}
-
 static void PUT32(uint32_t address, uint32_t value) {
-	*((volatile uint32_t *) physical_to_virtual(address)) = value;
+	*MMIO_P2V(address) = value;
 }
 
 static uint32_t GET32(uint32_t address) {
-	return *((volatile uint32_t *) physical_to_virtual(address));
+	return *MMIO_P2V(address);
 }
 
 /*

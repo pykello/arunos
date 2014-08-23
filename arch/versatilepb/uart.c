@@ -2,7 +2,7 @@
 #include <vm.h>
 
 /* memory mapping for the serial port */
-#define UART0 ((volatile unsigned int*) UART0_BASE)
+#define UART0 MMIO_P2V(0x101f1000)
 
 /* serial port register offsets */
 #define UART_DATA        0x00 

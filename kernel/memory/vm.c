@@ -1,4 +1,5 @@
 #include <vm.h>
+#include <hardware.h>
 #include <lib/string.h>
 #include <kalloc.h>
 #include <klib.h>
@@ -12,15 +13,13 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 /* kernel virtual to physical memory mappings */
 static struct MemoryMapping kernel_mappings[] = {
 	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_D},
-	{UART0_BASE, UART0_PHYSICAL, UART0_PHYSICAL + PAGE_SIZE, AP_RW_D},
-	{PIC_BASE, PIC_PHYSICAL, PIC_PHYSICAL + PAGE_SIZE, AP_RW_D},
-	{GPIO_BASE, GPIO_PHYSICAL, GPIO_PHYSICAL + PAGE_SIZE, AP_RW_D},
+	{MMIO_BASE, MMIO_BASE_PHYSICAL, MMIO_BASE_PHYSICAL + 0x400000, AP_RW_D},
 	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_D},
 	{ALLOCATABLE_MEMORY_START, V2P(ALLOCATABLE_MEMORY_START),
 		TOTAL_MEMORY_SIZE, AP_RW_D}
 };
 
-const int kernel_mapping_count = 6;
+const int kernel_mapping_count = 4;
 
 struct SectionTableEntry *kernel_vm = NULL;
 

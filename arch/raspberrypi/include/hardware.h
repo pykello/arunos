@@ -9,14 +9,8 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
 
-/* physical memory */
-#define UART0_PHYSICAL 0x20215000
-#define PIC_PHYSICAL 0x2000B000
-#define GPIO_PHYSICAL 0x20200000
-
+#define MMIO_BASE_PHYSICAL 0x20000000
+#define TOTAL_MEMORY_SIZE   0x1ff00000  /* 511MB */
 #define UART_IRQ 29
 
-#define TOTAL_MEMORY_SIZE   0x1ff00000  /* 511MB */
-
 #endif
- 

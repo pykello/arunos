@@ -3,7 +3,7 @@
 #include <lib/string.h>
 
 /* memory mapping for the interrupt controller */
-#define PIC ((volatile unsigned int*) PIC_BASE)
+#define PIC MMIO_P2V(0x10140000)
 
 /* interrupt controller register offsets */
 #define PIC_STATUS     0x0
