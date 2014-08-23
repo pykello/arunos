@@ -100,7 +100,6 @@ void proc_expand_memory(struct Process *proc, int page_count);
 void proc_shrink_memory(struct Process *proc, int page_count);
 bool proc_load(struct Process *proc, char **proc_image, int page_count);
 void proc_start(struct Process *proc);
-void set_current_process(struct Process *proc);
 int *get_current_context(void);
 
 /* scheduler.c */
@@ -115,6 +114,7 @@ int syscall_exit(int arg1);
 int syscall_getpid(void);
 int syscall_fork(void);
 int syscall_exec(int id);
+int syscall_yield(void);
 
 #endif
 #endif
