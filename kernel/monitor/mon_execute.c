@@ -29,7 +29,7 @@ int mon_execute(int argc, char **argv)
 	loaded = proc_load_program(proc, program_index);
 
 	if (loaded)
-		proc_start(proc);
+		schedule();
 	else {
 		kprintf("couldn't load the process.\n");
 	}
