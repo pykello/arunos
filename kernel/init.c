@@ -14,11 +14,12 @@ void c_entry(void)
 		    KERNEL_BASE + INITIAL_MEMORY_SIZE);
 	vm_init();
 	proc_init();
-	scheduler_init();
 	console_init();
 	kalloc_init(KERNEL_BASE + INITIAL_MEMORY_SIZE,
 		    KERNEL_BASE + TOTAL_MEMORY_SIZE);
+	scheduler_init();
 
 	/* start the kernel monitor, which should run forever */
 	monitor();
+
 }
