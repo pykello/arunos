@@ -23,7 +23,7 @@
 #include <types.h>
 
 typedef void (*entry_function)(void);
-#define PROCESS_COUNT_MAX 32
+#define PROCESS_COUNT_MAX 10
 
 enum ProcessState {
 	UNUSED,
