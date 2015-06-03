@@ -68,6 +68,7 @@ interrupt_table_start:
 interrupt_table_end:
 
 syscall_entry:
+	ldr sp, =kernel_stack_start
 	SAVE_CONTEXT
 
 	stmfd r13!, {r1-r12, r14}

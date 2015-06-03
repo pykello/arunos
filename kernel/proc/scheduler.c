@@ -24,7 +24,6 @@ void scheduler_init(void)
 void schedule(void)
 {
 	int i;
-	// mon_status(0, 0);
 	for (i = 0; i < PROCESS_COUNT_MAX; i++) {
 		struct Process *proc = NULL;
 
