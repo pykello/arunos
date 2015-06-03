@@ -78,6 +78,7 @@ syscall_entry:
 
 irq_entry:
 	sub r14, r14, #4
+	ldr sp, =irq_stack_start
 	SAVE_CONTEXT
 
 	stmfd r13!, {r0-r12, r14}

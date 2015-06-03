@@ -10,8 +10,6 @@ static int round_robin_index;
 
 void handle_timer(void)
 {
-	//schedule();
-	kprintf("timer\n");
 	timer_clear_interrupt();
 	schedule();
 }
@@ -26,12 +24,9 @@ void scheduler_init(void)
 void schedule(void)
 {
 	int i;
-	kprintf("schedule \n");
+	// mon_status(0, 0);
 	for (i = 0; i < PROCESS_COUNT_MAX; i++) {
 		struct Process *proc = NULL;
-
-		//kprintf("round_robin_index = %d\n", round_robin_index);
-		//kprintf("&round_robin_index = %x\n", &round_robin_index);
 
 		round_robin_index++;
 		if (round_robin_index == PROCESS_COUNT_MAX)
@@ -40,7 +35,6 @@ void schedule(void)
 		}
 
 		proc = &process_table[round_robin_index];
-		kprintf("process[%d]->state = %d\n", round_robin_index, proc->state);
 
 		if (proc->state == READY) {
 			current_process = proc;
@@ -48,10 +42,7 @@ void schedule(void)
 		}
 	}
 
-	/* no process is ready to run, run monitor */
-	set_translation_table_base((uint32_t) V2P(kernel_vm));
-	current_process = NULL;
-	__asm__ volatile("ldr sp, =kernel_stack_start");
-	enable_interrupts();
-	monitor();
+	/* no process? panic */
+	kprintf("PANIC");
+	while(1);
 }
