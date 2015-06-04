@@ -15,7 +15,6 @@ void _start()
 
 		program_idx = command[0] - '0';
 		child_pid = fork();
-		printf("child_pid = %d\n", child_pid);
 		if (child_pid == 0) {
 			exec(program_idx);
 		}

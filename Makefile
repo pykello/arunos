@@ -20,7 +20,7 @@ CFLAGS = -mcpu=$(CPU) -gstabs -I include -I arch/$(arch)/include -marm \
          -fno-builtin-printf -fno-builtin-strcpy -Wno-overlength-strings \
          -fno-builtin-exit
 ASFLAGS = -mcpu=$(CPU) -g -I include -I arch/$(arch)/include
-QEMU_FLAGS = $(ARCH_QEMU_FLAGS) -nographic -d in_asm
+QEMU_FLAGS = $(ARCH_QEMU_FLAGS) -nographic
 
 all: $(OS).bin
 

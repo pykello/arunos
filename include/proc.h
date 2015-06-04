@@ -14,8 +14,11 @@
 #define SAVE_CONTEXT \
 	push {r0, r14};\
 	mov r0, lr;\
-	bl save_context;\
-	pop {r0, r14};
+	bl save_context_1;\
+	pop {r0, r14};\
+	push {r14};\
+	bl save_context_2;\
+	pop {r14};
 
 #else
 
