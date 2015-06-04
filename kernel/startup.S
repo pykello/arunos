@@ -9,7 +9,6 @@ entry:
 	bl copy_interrupt_table
 	bl use_high_interrupts
 	bl enable_interrupts
-	bl setup_irq_stack_pointer
 
 	bl jump_to_high_mem
 	bl c_entry
@@ -42,16 +41,6 @@ copy_interrupt_table:
 		add r1, r1, #0x4
 		cmp r1, r3
 		bne copy_loop_start
-
-	mov pc, lr
-
-setup_irq_stack_pointer:
-	mrs r0, cpsr
-	bic r1, r0, #0x1F
-	orr r1, r1, #0x12  
-	msr cpsr, r1  
-	ldr sp, =irq_stack_start
-	msr cpsr, r0
 
 	mov pc, lr
 

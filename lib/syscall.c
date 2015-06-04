@@ -70,3 +70,8 @@ void yield(void)
 {
 	syscall0(SYSCALL_YIELD);
 }
+
+void wait(int id)
+{
+	syscall1(SYSCALL_WAIT, id);
+}

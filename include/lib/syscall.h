@@ -16,7 +16,8 @@ enum SystemCallCode {
 	SYSCALL_GETPID,
 	SYSCALL_FORK,
 	SYSCALL_EXEC,
-	SYSCALL_YIELD
+	SYSCALL_YIELD,
+	SYSCALL_WAIT
 };
 
 int syscall0(enum SystemCallCode code);
@@ -30,5 +31,6 @@ int getpid(void);
 int fork(void);
 void exec(int id);
 void yield(void);
+void wait(int id);
 
 #endif

@@ -3,15 +3,25 @@
 
 void _start()
 {
-	int i = 0, j = 0;
-	fork();
-	fork();
-	fork();
+	char command[128];
+	int program_idx = 0;
+	int child_pid = 0;
 
 	while (1) {
-		printf("step %d at pid %d\n", i, getpid());
-		yield();
-		i++;
+		printf("$ ");
+		gets(command);
+		if (command[0] < '0' || command[0] > '9')
+			continue;
+
+		program_idx = command[0] - '0';
+		child_pid = fork();
+		printf("child_pid = %d\n", child_pid);
+		if (child_pid == 0) {
+			exec(program_idx);
+		}
+		else {
+			wait(child_pid);
+		}
 	}
 
 	exit(0);

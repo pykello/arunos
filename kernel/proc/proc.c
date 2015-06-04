@@ -69,6 +69,7 @@ struct Process *proc_create(void)
 	proc->heap_size = 0;
 	proc->kernel_stack = kernel_stack;
 	proc->user_stack = user_stack;
+	proc->wait_pid = -1;
 
 	return proc;
 }

@@ -49,6 +49,9 @@ struct Process {
 	char *user_stack;
 	char *kernel_stack;
 	int context[17];
+
+	int wait_pid;
+	int child_return_value;
 };
 
 #define ELF_MAGIC 0x464C457FU
@@ -115,6 +118,7 @@ int syscall_getpid(void);
 int syscall_fork(void);
 int syscall_exec(int id);
 int syscall_yield(void);
+int syscall_wait(int id);
 
 #endif
 #endif
