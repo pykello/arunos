@@ -14,8 +14,11 @@
 #define SAVE_CONTEXT \
 	push {r0, r14};\
 	mov r0, lr;\
-	bl save_context;\
-	pop {r0, r14};
+	bl save_context_1;\
+	pop {r0, r14};\
+	push {r14};\
+	bl save_context_2;\
+	pop {r14};
 
 #else
 
@@ -23,7 +26,7 @@
 #include <types.h>
 
 typedef void (*entry_function)(void);
-#define PROCESS_COUNT_MAX 32
+#define PROCESS_COUNT_MAX 10
 
 enum ProcessState {
 	UNUSED,
@@ -49,6 +52,9 @@ struct Process {
 	char *user_stack;
 	char *kernel_stack;
 	int context[17];
+
+	int wait_pid;
+	int child_return_value;
 };
 
 #define ELF_MAGIC 0x464C457FU
@@ -115,6 +121,7 @@ int syscall_getpid(void);
 int syscall_fork(void);
 int syscall_exec(int id);
 int syscall_yield(void);
+int syscall_wait(int id);
 
 #endif
 #endif

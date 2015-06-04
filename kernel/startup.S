@@ -9,7 +9,6 @@ entry:
 	bl copy_interrupt_table
 	bl use_high_interrupts
 	bl enable_interrupts
-	bl setup_irq_stack_pointer
 
 	bl jump_to_high_mem
 	bl c_entry
@@ -45,16 +44,6 @@ copy_interrupt_table:
 
 	mov pc, lr
 
-setup_irq_stack_pointer:
-	mrs r0, cpsr
-	bic r1, r0, #0x1F
-	orr r1, r1, #0x12  
-	msr cpsr, r1  
-	ldr sp, =irq_stack_start
-	msr cpsr, r0
-
-	mov pc, lr
-
 interrupt_table_start:
 	nop
 	subs pc, lr, #4
@@ -68,6 +57,7 @@ interrupt_table_start:
 interrupt_table_end:
 
 syscall_entry:
+	ldr sp, =kernel_stack_start
 	SAVE_CONTEXT
 
 	stmfd r13!, {r1-r12, r14}
@@ -78,6 +68,7 @@ syscall_entry:
 
 irq_entry:
 	sub r14, r14, #4
+	ldr sp, =irq_stack_start
 	SAVE_CONTEXT
 
 	stmfd r13!, {r0-r12, r14}

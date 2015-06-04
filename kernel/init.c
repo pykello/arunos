@@ -3,6 +3,7 @@
 #include <kalloc.h>
 #include <monitor.h>
 #include <proc.h>
+#include <timer.h>
 
 /*
  * Kernel starts executing C code here. Before entring this function, some
@@ -17,9 +18,12 @@ void c_entry(void)
 	console_init();
 	kalloc_init(KERNEL_BASE + INITIAL_MEMORY_SIZE,
 		    KERNEL_BASE + TOTAL_MEMORY_SIZE);
-	scheduler_init();
 
-	/* start the kernel monitor, which should run forever */
-	monitor();
-
+	/* start the first program */
+	{
+		struct Process *proc = proc_create();
+		proc_load_program(proc, 0);
+		scheduler_init();
+		schedule();
+	}
 }

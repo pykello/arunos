@@ -8,3 +8,4 @@ OBJS += $(PROC_DIR)/syscall_getpid.o
 OBJS += $(PROC_DIR)/syscall_fork.o
 OBJS += $(PROC_DIR)/syscall_exec.o
 OBJS += $(PROC_DIR)/syscall_yield.o
+OBJS += $(PROC_DIR)/syscall_wait.o
