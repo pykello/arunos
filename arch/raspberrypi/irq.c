@@ -1,6 +1,7 @@
 #include <irq.h>
 #include <vm.h>
 #include <lib/string.h>
+#include <klib.h>
 
 /* memory mapping for the interrupt controller */
 #define PIC MMIO_P2V(0x2000B000)

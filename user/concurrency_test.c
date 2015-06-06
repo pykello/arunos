@@ -6,9 +6,9 @@ void _start()
 	int i = 0;
 	fork();
 
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < 50000; i++) {
 		printf("step %d at pid %d\n", i, getpid());
-		yield();
+		//yield();
 	}
 
 	exit(0);

@@ -12,5 +12,6 @@
 #define MMIO_BASE_PHYSICAL 0x20000000
 #define TOTAL_MEMORY_SIZE   0x1ff00000  /* 511MB */
 #define UART_IRQ 29
+#define TIMER_IRQ 1
 
 #endif

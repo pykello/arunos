@@ -17,8 +17,8 @@ void handle_timer(void)
 void scheduler_init(void)
 {
 	round_robin_index = 0;
-	timer_set_interval(1000);
-	register_interrupt_handler(0x5, handle_timer);
+	timer_set_interval(100000);
+	register_interrupt_handler(TIMER_IRQ, handle_timer);
 }
 
 void schedule(void)

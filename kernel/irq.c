@@ -1,4 +1,5 @@
 #include <irq.h>
+#include <klib.h>
 
 
 /* interrupt handler vector */
