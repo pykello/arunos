@@ -35,7 +35,7 @@ uint8_t buffer[40960];
 void timer_set_interval(uint32_t interval_microsecond)
 {
 	bool ret;
-	uint32_t i, m, e, csd_struct;
+	uint32_t i;
 
 	TIMER[TIMER_CONTROL] = 0;
 	TIMER[TIMER_BGLOAD] = 0;
@@ -47,11 +47,12 @@ void timer_set_interval(uint32_t interval_microsecond)
 	ret = realview_mmc_probe(&mmc_card_info);
 	kprintf("prob_result: %d\n", ret);
 
-	csd_struct = UNSTUFF_BITS(mmc_card_info.raw_csd, 126, 2);
-	e = UNSTUFF_BITS(mmc_card_info.raw_csd, 47, 3);
-	m = UNSTUFF_BITS(mmc_card_info.raw_csd, 62, 12);
+	ret = mmc_card_decode(&mmc_card);
+	kprintf("decode result: %d\n", ret);
 
-	kprintf("csd_struct: %d, size: %d\n", csd_struct, (1 + m) << (e + 2));
+	kprintf("sector size: %d, sector count: %d, capacity: %d\n",
+		mmc_card_info.sector_size, mmc_card_info.sector_count,
+		mmc_card_info.capacity);
 
 	ret = realview_mmc_read_one_sector(&mmc_card, buffer, 0);
 	kprintf("read result: %d\n", ret);

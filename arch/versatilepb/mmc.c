@@ -14,6 +14,38 @@ typedef int32_t s32_t;
 #define TRUE true
 #define FALSE false
 
+static uint32_t UNSTUFF_BITS(uint32_t *resp, uint32_t start, uint32_t size)								\
+{																\
+	const int32_t __size = size;									\
+	const uint32_t __mask = (__size < 32 ? 1 << __size : 0) - 1;	\
+	const int32_t __off = 3 - ((start) / 32);						\
+	const int32_t __shft = (start) & 31;							\
+	uint32_t __res;												\
+																\
+	__res = resp[__off] >> __shft;								\
+	if (__size + __shft > 32)									\
+		__res |= resp[__off-1] << ((32 - __shft) % 32);			\
+	return __res & __mask;												\
+}
+
+static const u32_t tran_exp[] = {
+	10000, 100000, 1000000, 10000000, 0, 0, 0, 0
+};
+
+static const u8_t tran_mant[] = {
+	0,	10,	12,	13,	15,	20,	25,	30,
+	35,	40,	45,	50,	55,	60,	70,	80,
+};
+
+static const u32_t tacc_exp[] = {
+	1, 10, 100, 1000, 10000, 100000, 1000000, 10000000,
+};
+
+static const u32_t tacc_mant[] = {
+	0,	10,	12,	13,	15,	20,	25,	30,
+	35,	40,	45,	50,	55,	60,	70,	80,
+};
+
 /*
  * prime cell pl181 mci register
  */
@@ -527,7 +559,7 @@ bool_t realview_mmc_read_one_sector(struct mmc_card_t * card, u8_t * buf, u32_t 
 
 	do {
 		len = remain - (read32(REALVIEW_MCI_FIFO_CNT) << 2);
-		kprintf("len: %d\n", len);
+		//kprintf("len: %d\n", len);
 
 		if(len <= 0)
 			break;
@@ -535,7 +567,7 @@ bool_t realview_mmc_read_one_sector(struct mmc_card_t * card, u8_t * buf, u32_t 
 		for(i = 0; i < (len >> 2); i++)
 		{
 			v = read32(REALVIEW_MCI_FIFO);
-			kprintf("v: %x\n", v);
+			//kprintf("v: %x\n", v);
 			*(p++) = (v >> 0) & 0xff;
 			*(p++) = (v >> 8) & 0xff;
 			*(p++) = (v >> 16) & 0xff;
@@ -680,3 +712,202 @@ bool_t realview_mmc_write_sectors(struct mmc_card_t * card, const u8_t * buf, u3
 	return TRUE;
 }
 
+bool_t mmc_card_decode(struct mmc_card_t * card)
+{
+	struct mmc_card_info_t * info;
+	u32_t e, m, csd_struct;
+	u32_t mmca_vsn;
+
+	if(!card || !card->info)
+		return FALSE;
+
+	info = card->info;
+
+	/*
+	 * decode cid
+	 */
+	switch(info->type)
+	{
+	case MMC_CARD_TYPE_MMC:
+		mmca_vsn				= UNSTUFF_BITS(info->raw_csd, 122, 4);
+		switch(mmca_vsn)
+		{
+		case 0:	/* mmc v1.0 - v1.2 */
+		case 1: /* mmc v1.4 */
+			info->cid.mid		= UNSTUFF_BITS(info->raw_cid, 120, 8);
+			info->cid.oid		= UNSTUFF_BITS(info->raw_cid, 104, 16);
+			info->cid.pnm[0]	= UNSTUFF_BITS(info->raw_cid, 96, 8);
+			info->cid.pnm[1] 	= UNSTUFF_BITS(info->raw_cid, 88, 8);
+			info->cid.pnm[2] 	= UNSTUFF_BITS(info->raw_cid, 80, 8);
+			info->cid.pnm[3] 	= UNSTUFF_BITS(info->raw_cid, 72, 8);
+			info->cid.pnm[4] 	= UNSTUFF_BITS(info->raw_cid, 64, 8);
+			info->cid.pnm[5] 	= UNSTUFF_BITS(info->raw_cid, 56, 8);
+			info->cid.pnm[6] 	= UNSTUFF_BITS(info->raw_cid, 48, 8);
+			info->cid.pnm[7] 	= 0;
+			info->cid.hwrev 	= UNSTUFF_BITS(info->raw_cid, 44, 4);
+			info->cid.fwrev 	= UNSTUFF_BITS(info->raw_cid, 40, 4);
+			info->cid.serial 	= UNSTUFF_BITS(info->raw_cid, 16, 24);
+			info->cid.year		= UNSTUFF_BITS(info->raw_cid, 8, 4);
+			info->cid.year		= info->cid.year + 1997;
+			info->cid.month		= UNSTUFF_BITS(info->raw_cid, 12, 4);
+			break;
+
+		case 2: /* mmc v2.0 - v2.2 */
+		case 3: /* mmc v3.1 - v3.3 */
+		case 4: /* mmc v4 */
+			info->cid.mid		= UNSTUFF_BITS(info->raw_cid, 120, 8);
+			info->cid.oid		= UNSTUFF_BITS(info->raw_cid, 104, 16);
+			info->cid.pnm[0]	= UNSTUFF_BITS(info->raw_cid, 96, 8);
+			info->cid.pnm[1] 	= UNSTUFF_BITS(info->raw_cid, 88, 8);
+			info->cid.pnm[2] 	= UNSTUFF_BITS(info->raw_cid, 80, 8);
+			info->cid.pnm[3] 	= UNSTUFF_BITS(info->raw_cid, 72, 8);
+			info->cid.pnm[4] 	= UNSTUFF_BITS(info->raw_cid, 64, 8);
+			info->cid.pnm[5] 	= UNSTUFF_BITS(info->raw_cid, 56, 8);
+			info->cid.pnm[6] 	= 0;
+			info->cid.pnm[7] 	= 0;
+			info->cid.hwrev 	= 0;
+			info->cid.fwrev 	= 0;
+			info->cid.serial 	= UNSTUFF_BITS(info->raw_cid, 16, 32);
+			info->cid.year		= UNSTUFF_BITS(info->raw_cid, 8, 4);
+			info->cid.year		= info->cid.year + 1997;
+			info->cid.month		= UNSTUFF_BITS(info->raw_cid, 12, 4);
+			break;
+
+		default:
+			kprintf("mmc error 1\n");
+			return FALSE;
+		}
+
+		break;
+
+	case MMC_CARD_TYPE_SD:
+	case MMC_CARD_TYPE_SD20:
+	case MMC_CARD_TYPE_SDHC:
+		info->cid.mid		= UNSTUFF_BITS(info->raw_cid, 120, 8);
+		info->cid.oid		= UNSTUFF_BITS(info->raw_cid, 104, 16);
+		info->cid.pnm[0]	= UNSTUFF_BITS(info->raw_cid, 96, 8);
+		info->cid.pnm[1] 	= UNSTUFF_BITS(info->raw_cid, 88, 8);
+		info->cid.pnm[2] 	= UNSTUFF_BITS(info->raw_cid, 80, 8);
+		info->cid.pnm[3] 	= UNSTUFF_BITS(info->raw_cid, 72, 8);
+		info->cid.pnm[4] 	= UNSTUFF_BITS(info->raw_cid, 64, 8);
+		info->cid.pnm[5] 	= 0;
+		info->cid.pnm[6] 	= 0;
+		info->cid.pnm[7] 	= 0;
+		info->cid.hwrev 	= UNSTUFF_BITS(info->raw_cid, 60, 4);
+		info->cid.fwrev 	= UNSTUFF_BITS(info->raw_cid, 56, 4);
+		info->cid.serial 	= UNSTUFF_BITS(info->raw_cid, 24, 32);
+		info->cid.year		= UNSTUFF_BITS(info->raw_cid, 12, 8);
+		info->cid.year		= info->cid.year + 2000;
+		info->cid.month		= UNSTUFF_BITS(info->raw_cid, 8, 4);
+		break;
+
+	default:
+		return FALSE;
+	}
+
+	/*
+	 * decode csd
+	 */
+	csd_struct = UNSTUFF_BITS(info->raw_csd, 126, 2);
+	switch(info->type)
+	{
+	case MMC_CARD_TYPE_MMC:
+		if(csd_struct != 1 && csd_struct != 2)
+		{
+			kprintf("mmc error 2\n");
+			return FALSE;
+		}
+
+		info->csd.mmca_vsn				= UNSTUFF_BITS(info->raw_csd, 122, 4);
+		info->csd.cmdclass				= UNSTUFF_BITS(info->raw_csd, 84, 12);
+
+		info->csd.tacc_clks				= UNSTUFF_BITS(info->raw_csd, 104, 8) * 100;
+		m								= UNSTUFF_BITS(info->raw_csd, 115, 4);
+		e								= UNSTUFF_BITS(info->raw_csd, 112, 3);
+		info->csd.tacc_ns				= (tacc_exp[e] * tacc_mant[m] + 9) / 10;
+
+		info->csd.r2w_factor			= UNSTUFF_BITS(info->raw_csd, 26, 3);
+		m								= UNSTUFF_BITS(info->raw_csd, 99, 4);
+		e								= UNSTUFF_BITS(info->raw_csd, 96, 3);
+		info->csd.max_dtr				= tran_exp[e] * tran_mant[m];
+
+		info->csd.read_blkbits			= UNSTUFF_BITS(info->raw_csd, 80, 4);
+		info->csd.write_blkbits			= UNSTUFF_BITS(info->raw_csd, 22, 4);
+		e								= UNSTUFF_BITS(info->raw_csd, 47, 3);
+		m								= UNSTUFF_BITS(info->raw_csd, 62, 12);
+		info->csd.capacity				= (1 + m) << (e + 2);
+
+		info->csd.read_partial			= UNSTUFF_BITS(info->raw_csd, 79, 1);
+		info->csd.read_misalign			= UNSTUFF_BITS(info->raw_csd, 77, 1);
+		info->csd.write_misalign		= UNSTUFF_BITS(info->raw_csd, 78, 1);
+		info->csd.write_partial			= UNSTUFF_BITS(info->raw_csd, 21, 1);
+		break;
+
+	case MMC_CARD_TYPE_SD:
+	case MMC_CARD_TYPE_SD20:
+	case MMC_CARD_TYPE_SDHC:
+		switch(csd_struct)
+		{
+		case 0:
+			info->csd.cmdclass			= UNSTUFF_BITS(info->raw_csd, 84, 12);
+
+			info->csd.tacc_clks			= UNSTUFF_BITS(info->raw_csd, 104, 8) * 100;
+			m 							= UNSTUFF_BITS(info->raw_csd, 115, 4);
+			e 							= UNSTUFF_BITS(info->raw_csd, 112, 3);
+			info->csd.tacc_ns			= (tacc_exp[e] * tacc_mant[m] + 9) / 10;
+
+			info->csd.r2w_factor		= UNSTUFF_BITS(info->raw_csd, 26, 3);
+			m 							= UNSTUFF_BITS(info->raw_csd, 99, 4);
+			e 							= UNSTUFF_BITS(info->raw_csd, 96, 3);
+			info->csd.max_dtr			= tran_exp[e] * tran_mant[m];
+
+			info->csd.read_blkbits 		= UNSTUFF_BITS(info->raw_csd, 80, 4);
+			info->csd.write_blkbits		= UNSTUFF_BITS(info->raw_csd, 22, 4);
+			e 							= UNSTUFF_BITS(info->raw_csd, 47, 3);
+			m 							= UNSTUFF_BITS(info->raw_csd, 62, 12);
+			info->csd.capacity			= (1 + m) << (e + 2);
+
+			info->csd.read_partial 		= UNSTUFF_BITS(info->raw_csd, 79, 1);
+			info->csd.read_misalign		= UNSTUFF_BITS(info->raw_csd, 77, 1);
+			info->csd.write_misalign	= UNSTUFF_BITS(info->raw_csd, 78, 1);
+			info->csd.write_partial		= UNSTUFF_BITS(info->raw_csd, 21, 1);
+			break;
+
+		case 1:
+			info->csd.cmdclass			= UNSTUFF_BITS(info->raw_csd, 84, 12);
+
+			info->csd.tacc_clks			= 0;
+			info->csd.tacc_ns			= 0;
+
+			info->csd.r2w_factor		= 4;
+			m							= UNSTUFF_BITS(info->raw_csd, 99, 4);
+			e							= UNSTUFF_BITS(info->raw_csd, 96, 3);
+			info->csd.max_dtr			= tran_exp[e] * tran_mant[m];
+
+			info->csd.read_blkbits		= 9;
+			info->csd.write_blkbits		= 9;
+			m							= UNSTUFF_BITS(info->raw_csd, 48, 22);
+			info->csd.capacity			= (1 + m) << 10;
+
+			info->csd.read_partial		= 0;
+			info->csd.read_misalign		= 0;
+			info->csd.write_misalign	= 0;
+			info->csd.write_partial		= 0;
+			break;
+
+		default:
+			kprintf("mmc error\n");
+			return FALSE;
+		}
+		break;
+
+	default:
+		return FALSE;
+	}
+
+	info->sector_size = 1 << info->csd.read_blkbits;
+	info->sector_count = info->csd.capacity;
+	info->capacity = info->sector_count * info->sector_size;
+
+	return TRUE;
+}

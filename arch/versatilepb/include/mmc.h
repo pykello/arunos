@@ -95,6 +95,6 @@ bool realview_mmc_read_one_sector(struct mmc_card_t * card, uint8_t * buf, uint3
 bool realview_mmc_write_one_sector(struct mmc_card_t * card, const uint8_t * buf, uint32_t sector);
 bool realview_mmc_read_sectors(struct mmc_card_t * card, uint8_t * buf, uint32_t sector, uint32_t count);
 bool realview_mmc_write_sectors(struct mmc_card_t * card, const uint8_t * buf, uint32_t sector, uint32_t count);
-
+bool mmc_card_decode(struct mmc_card_t * card);
 
 #endif
