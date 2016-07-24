@@ -190,3 +190,11 @@ int *get_current_context(void)
 {
 	return current_process->context;
 }
+
+struct Process *proc_get(int pid)
+{
+	if (pid > 0 && pid <= PROCESS_COUNT_MAX)
+		return &process_table[pid - 1];
+	else
+		return NULL;
+}

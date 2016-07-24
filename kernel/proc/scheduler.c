@@ -17,7 +17,7 @@ void handle_timer(void)
 void scheduler_init(void)
 {
 	round_robin_index = 0;
-	timer_set_interval(100000);
+	timer_set_interval(200000);
 	register_interrupt_handler(TIMER_IRQ, handle_timer);
 }
 
@@ -36,7 +36,6 @@ void schedule(void)
 		proc = &process_table[round_robin_index];
 
 		if (proc->state == READY) {
-			//kprintf("scheduling %d\n", round_robin_index);
 			current_process = proc;
 			proc_start(proc);
 		}
@@ -44,9 +43,24 @@ void schedule(void)
 
 	/* no process? panic */
 	mon_status(0, 0);
-	kprintf("round_robin_index = %d\n", round_robin_index);
-	for (i = 0; i < PROCESS_COUNT_MAX; i++)
-		kprintf("[%d] = %d\n", i, process_table[i].state);
+	dump_scheduler_status();
 	kprintf("PANIC");
 	while(1);
+}
+
+void dump_scheduler_status(void)
+{
+	int i;
+	for (i = 0; i < PROCESS_COUNT_MAX; i++)
+		if (i == round_robin_index)
+			kprintf("v");
+		else
+			kprintf(" ");
+	kprintf("\n");
+	for (i = 0; i < PROCESS_COUNT_MAX; i++)
+		kprintf("%d", i);
+	kprintf("\n");
+	for (i = 0; i < PROCESS_COUNT_MAX; i++)
+		kprintf("%d", process_table[i].state);
+	kprintf("\n");
 }

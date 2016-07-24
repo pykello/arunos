@@ -107,10 +107,12 @@ void proc_shrink_memory(struct Process *proc, int page_count);
 bool proc_load(struct Process *proc, char **proc_image, int page_count);
 void proc_start(struct Process *proc);
 int *get_current_context(void);
+struct Process *proc_get(int pid);
 
 /* scheduler.c */
 void scheduler_init(void);
 void schedule(void);
+void dump_scheduler_status(void);
 
 /* syscall_exec.c */
 bool proc_load_program(struct Process *proc, int program_index);
