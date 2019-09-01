@@ -46,6 +46,11 @@ to be able to compile the code. To install these tools in Fedora 19, you can do:
 
     sudo yum install arm-none-eabi-binutils-cs
     sudo yum install arm-none-eabi-gcc-cs
+    
+In Ubuntu:
+    
+    sudo apt install binutils-arm-none-eabi
+    sudo apt install gcc-arm-none-eabi
 
 After installing these tools, you can run the following command to build the
 kernel:
