@@ -14,6 +14,9 @@ LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
 
+# don't get pulseaudio related errors when qemu starts
+export QEMU_AUDIO_DRV = none
+
 # flags
 CFLAGS = -mcpu=$(CPU) -gstabs -I include -I arch/$(arch)/include -marm \
          -std=c99 -pedantic -Wall -Wextra -msoft-float -fPIC -mapcs-frame \
@@ -39,7 +42,8 @@ ifeq ($(arch),raspberrypi)
 	cp arunos.bin /run/media/hadi/boot/kernel.img
 endif
 
-qemu: $(OS).bin
+qemu: $(OS).bin 
+	./a.sh
 	qemu-system-arm $(QEMU_FLAGS) -kernel $(OS).bin
 
 qemu-gdb: $(OS).bin
