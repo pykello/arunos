@@ -43,7 +43,6 @@ ifeq ($(arch),raspberrypi)
 endif
 
 qemu: $(OS).bin 
-	./a.sh
 	qemu-system-arm $(QEMU_FLAGS) -kernel $(OS).bin
 
 qemu-gdb: $(OS).bin
