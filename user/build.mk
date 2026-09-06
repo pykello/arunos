@@ -12,7 +12,7 @@ USER_PROGRAMS = user/shell \
 EXTRA_CLEAN += $(USER_PROGRAMS)
 
 user/%: user/%.c lib/libarunos.a
-	$(USER_CC) $(USER_CFLAGS) -c -o $@.o $<
+	$(USER_CC) $(USER_CFLAGS) -MMD -MP -MF $@.d -MT $@ -c -o $@.o $<
 	$(LD) -Ttext=100 $@.o lib/libarunos.a -o $@
 	rm -f $@.o
 
