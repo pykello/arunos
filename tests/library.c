@@ -56,8 +56,25 @@ static int test_format(void)
 	return 0;
 }
 
+static int test_tokens(void)
+{
+	char text[] = "  help  next, last  ";
+	char empty[] = "", delimiters[] = " , ", single[] = "one";
+	CHECK(!strtok(NULL, " ,"));
+	CHECK(strcmp(strtok(text, " ,"), "help") == 0);
+	CHECK(strcmp(strtok(NULL, " ,"), "next") == 0);
+	CHECK(strcmp(strtok(NULL, " ,"), "last") == 0);
+	CHECK(!strtok(NULL, " ,") && !strtok(NULL, " ,"));
+	CHECK(!strtok(empty, " ,") && !strtok(NULL, " ,"));
+	CHECK(!strtok(delimiters, " ,") && !strtok(NULL, " ,"));
+	CHECK(strcmp(strtok(single, " ,"), "one") == 0);
+	CHECK(!strtok(NULL, " ,") && !strtok(NULL, " ,"));
+	return 0;
+}
+
 int main(void)
 {
 	int result = test_input();
-	return result ? result : test_format();
+	if (!result) result = test_format();
+	return result ? result : test_tokens();
 }

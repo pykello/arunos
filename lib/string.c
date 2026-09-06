@@ -125,6 +125,9 @@ char *strtok(char *str, const char *delimiters)
 	if (str != NULL)
 		last = str;
 
+	if (last == NULL)
+		return NULL;
+
 	token = last;
 
 	/* skip leading delimiters */
@@ -137,6 +140,8 @@ char *strtok(char *str, const char *delimiters)
 		return NULL;
 	}
 
+	last = token;
+
 	/* scan to find where token ends */
 	while (*last != '\0' && strchr(delimiters, *last) == NULL)
 		last++;
@@ -145,6 +150,8 @@ char *strtok(char *str, const char *delimiters)
 	if (*last != '\0') {
 		*last = '\0';
 		last++;
+	} else {
+		last = NULL;
 	}
 
 	return token;
