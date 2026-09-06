@@ -125,53 +125,6 @@ void proc_shrink_memory(struct Process *proc, int page_count)
 	}
 }
 
-/* proc_load loads the given ELF process image into the given process. */
-bool proc_load(struct Process *proc, char **proc_image, int page_count)
-{
-	int prog_header_offset = 0;
-	int prog_header_count = 0;
-	int i = 0;
-
-	struct ElfHeader *header = (struct ElfHeader *) proc_image[0];
-	if (header->type != ELFTYPE_EXECUTABLE)
-		return false;
-
-	(void) page_count;
-
-	prog_header_offset = header->phoff;
-	prog_header_count = header->phnum;
-
-	for (i = 0; i < prog_header_count; i++) {
-		uint32_t j = 0;
-		struct ElfProgramHeader *header = (void *) (proc_image[0] + prog_header_offset);
-
-		/* make enough room for this section */
-		while (proc->heap_size < header->vaddr + header->memsz)
-			proc_expand_memory(proc, 1);
-
-		/* copy the section */
-		for (j = 0; j < header->memsz; j++) {
-			int vaddr = header->vaddr + j;
-			int paddr = resolve_physical_address(proc->vm, vaddr);
-			char *ptr = (char *) P2V(paddr);
-			int image_off = header->off + j;
-			*ptr = proc_image[image_off / PAGE_SIZE][image_off % PAGE_SIZE];
-		}
-
-		prog_header_offset += sizeof(struct ElfProgramHeader);
-	}
-
-	proc->entry = (entry_function) header->entry;
-	proc->state = READY;
-
-	memset(proc->context, 0, sizeof(proc->context));
-	proc->context[CPSR] = 0x10;
-	proc->context[RESTART_ADDR] = (int) proc->entry;
-	proc->context[SP] = USER_STACK_BOTTOM + PAGE_SIZE;
-
-	return true;
-}
-
 /* proc_start starts running the given process. */
 void proc_start(struct Process *proc)
 {

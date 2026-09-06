@@ -26,14 +26,16 @@ Arunos currently has:
  * interrupt and timer support,
  * a page allocator and ARM section-table based virtual memory,
  * a small process table and scheduler,
- * ELF loading for embedded user programs,
+ * a polling virtio block driver and read-only FAT16 filesystem,
+ * ELF loading from disk,
  * basic system calls: putch, getch, exit, getpid, fork, exec, yield, wait,
  * a small user-space library with string, stdio, math, and syscall helpers,
  * a kernel monitor implementation with diagnostic commands.
 
 On boot, the kernel initializes memory, virtual memory, process management, and
-the console, then starts user program `0`, which is `user/shell.c`. The user
-shell prompts with `$` and runs embedded user programs by numeric index:
+the console, mounts `disk.img`, then starts `0.ELF`, built from
+`user/shell.c`. The user shell prompts with `$` and runs disk ELF files by
+numeric index:
 
  * `0`: shell
  * `1`: hello
@@ -48,14 +50,14 @@ The kernel monitor code provides these commands when entered by kernel code:
  * `hextee`: echo input bytes as hexadecimal until `q`,
  * `kerninfo`: print kernel symbol and footprint information,
  * `status`: print CPU, register, and memory status,
- * `execute <n>`: create a process and run embedded user program `<n>`.
+ * `execute <n>`: create a process and run `<n>.ELF` from the disk.
 
 
 Building
 --------
 
-You need a host C compiler and GNU cross-compilation tools for the
-`arm-none-eabi` target. The build expects these commands to be on `PATH`:
+You need a host C compiler, Python 3, dosfstools, mtools, and GNU
+cross-compilation tools for the `arm-none-eabi` target. The build expects these commands to be on `PATH`:
 
     gcc
     arm-none-eabi-ar
@@ -67,7 +69,8 @@ You need a host C compiler and GNU cross-compilation tools for the
 
 On Debian or Ubuntu, the cross-compiler packages are commonly:
 
-    sudo apt install gcc-arm-none-eabi binutils-arm-none-eabi
+    sudo apt install gcc gcc-arm-none-eabi binutils-arm-none-eabi \
+        dosfstools mtools python3
 
 Build the default VersatilePB image:
 
@@ -82,7 +85,8 @@ The build produces:
  * `arunos.bin`: raw boot image,
  * `arunos.elf`: ELF image with symbols,
  * `arunos.asm`: disassembly,
- * `user/user_programs.c`: generated embedded user-program table.
+ * `disk.img`: 16 MiB FAT16 disk containing `0.ELF` through `4.ELF`,
+ * `user/shell`, `user/hello`, etc.: standalone user ELF files.
 
 Clean generated files with:
 
@@ -100,8 +104,41 @@ Run the default image in QEMU:
 
     make qemu
 
-QEMU runs with `-nographic`, so the serial console is attached to the terminal.
+QEMU attaches `disk.img` as a read-only legacy virtio PCI block device.
+It runs with `-nographic`, so the serial console is attached to the terminal.
 To exit QEMU, press `Ctrl-A`, then `X`.
+
+
+Disk and ELF Scope
+------------------
+
+Storage intentionally supports one disk, synchronous 512-byte reads, and
+FAT16 starting at sector zero. Files must use root-directory 8.3 names;
+there are no partitions, subdirectories, long names, writes, or file syscalls.
+`exec(n)` loads `n.ELF` for indices 0 through 9 and returns -1 on failure.
+The image builder installs programs 0 through 4; the other names are optional.
+
+ELFs must be static little-endian ARM32 executables, with at most 16 program
+headers and load segments below 1 MiB. The loader reads segments directly
+from the filesystem and zeroes BSS. It stages a replacement in a spare
+process slot so failure preserves the caller; exec needs one free slot.
+A missing disk, invalid filesystem, or unusable `0.ELF` stops boot with a
+serial error message.
+
+To replace a program without rebuilding the kernel (with QEMU stopped):
+
+    mcopy -o -i disk.img user/hello ::1.elf
+
+`make` rebuilds the disk when a user program changes. `make clean` removes
+it, including any manual changes.
+
+Run the host FAT tests and QEMU boot/process tests:
+
+    make test
+
+Tests cover file contents and fragmentation, invalid filesystem metadata,
+malformed ELF headers, BSS, failed exec, disk-only replacement, and the
+existing hello, fork, exec, and concurrency programs.
 
 
 Debugging
@@ -141,8 +178,8 @@ Repository Layout
  * `kernel/`: core kernel, memory management, monitor, process, and syscall
    code,
  * `lib/`: user/kernel support library code,
- * `user/`: embedded user programs and the host-side encoder used to package
-   them into the kernel image.
+ * `user/`: user programs and FAT disk-image build rules,
+ * `tests/`: host filesystem tests and QEMU integration tests.
 
 
 Coding Style

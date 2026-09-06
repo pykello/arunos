@@ -1,4 +1,7 @@
 #include <console.h>
+#include <block.h>
+#include <fat.h>
+#include <klib.h>
 #include <vm.h>
 #include <kalloc.h>
 #include <monitor.h>
@@ -19,10 +22,18 @@ void c_entry(void)
 	kalloc_init(KERNEL_BASE + INITIAL_MEMORY_SIZE,
 		    KERNEL_BASE + TOTAL_MEMORY_SIZE);
 
+	if (!block_init() || !fat_init()) {
+		kprintf("boot: cannot mount FAT16 disk\n");
+		while (1);
+	}
+
 	/* start the first program */
 	{
 		struct Process *proc = proc_create();
-		proc_load_program(proc, 0);
+		if (!proc_load_program(proc, 0)) {
+			kprintf("boot: cannot load 0.ELF\n");
+			while (1);
+		}
 		scheduler_init();
 		schedule();
 	}

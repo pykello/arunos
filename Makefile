@@ -15,18 +15,17 @@ LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
 
-# don't get pulseaudio related errors when qemu starts
-export QEMU_AUDIO_DRV = none
-
 # flags
 CFLAGS = -mcpu=$(CPU) -gstabs -I include -I arch/$(arch)/include -marm \
          -std=c99 -pedantic -Wall -Wextra -msoft-float -fPIC -mapcs-frame \
          -fno-builtin-printf -fno-builtin-strcpy -Wno-overlength-strings \
          -fno-builtin-exit
 ASFLAGS = -mcpu=$(CPU) -g -I include -I arch/$(arch)/include
-QEMU_FLAGS = $(ARCH_QEMU_FLAGS) -nographic
+QEMU_FLAGS = $(ARCH_QEMU_FLAGS) -nographic -audio driver=none \
+	-drive if=none,id=disk,format=raw,file=disk.img,readonly=on \
+	-device virtio-blk-pci,drive=disk,disable-modern=on
 
-all: $(OS).bin
+all: $(OS).bin disk.img
 
 OBJS = kernel/startup.o
 
@@ -40,12 +39,17 @@ $(OS).bin: $(OBJS) $(OS).ld lib/libarunos.a
 	$(OBJCOPY) -O binary $(OS).elf $(OS).bin
 	$(OBJDUMP) -D $(OS).elf > $(OS).asm
 
-qemu: $(OS).bin 
+qemu: all
 	qemu-system-arm $(QEMU_FLAGS) -kernel $(OS).bin
 
-qemu-gdb: $(OS).bin
+qemu-gdb: all
 	qemu-system-arm $(QEMU_FLAGS) -gdb tcp::26000 -S -kernel $(OS).bin
 
 clean:
 	rm -f $(OBJS) $(EXTRA_CLEAN)
 	rm -f $(OS).elf $(OS).bin $(OS).asm
+
+.PHONY: all clean qemu qemu-gdb test
+test: all
+	python3 tests/fat.py
+	python3 tests/boot.py

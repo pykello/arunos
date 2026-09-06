@@ -31,6 +31,8 @@ int mon_execute(int argc, char **argv)
 	if (loaded)
 		schedule();
 	else {
+		if (proc)
+			proc_free(proc);
 		kprintf("couldn't load the process.\n");
 	}
 

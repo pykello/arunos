@@ -104,7 +104,6 @@ struct Process *proc_create(void);
 void proc_free(struct Process *proc);
 void proc_expand_memory(struct Process *proc, int page_count);
 void proc_shrink_memory(struct Process *proc, int page_count);
-bool proc_load(struct Process *proc, char **proc_image, int page_count);
 void proc_start(struct Process *proc);
 int *get_current_context(void);
 struct Process *proc_get(int pid);

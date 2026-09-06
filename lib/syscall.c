@@ -61,9 +61,9 @@ int fork(void)
 	return syscall0(SYSCALL_FORK);
 }
 
-void exec(int id)
+int exec(int id)
 {
-	syscall1(SYSCALL_EXEC, id);
+	return syscall1(SYSCALL_EXEC, id);
 }
 
 void yield(void)

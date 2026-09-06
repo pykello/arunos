@@ -16,7 +16,9 @@ void _start()
 		program_idx = command[0] - '0';
 		child_pid = fork();
 		if (child_pid == 0) {
-			exec(program_idx);
+			if (exec(program_idx) < 0)
+				printf("cannot execute %d\n", program_idx);
+			exit(1);
 		}
 		else {
 			wait(child_pid);
