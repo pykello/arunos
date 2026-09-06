@@ -9,6 +9,8 @@ int syscall_fork(void)
 	uint32_t i = 0;
 
 	child = proc_create();
+	if (!child)
+		return -1;
 	proc_expand_memory(child, parent->heap_size / PAGE_SIZE);
 
 	/* copy parent's memory to child's memory */

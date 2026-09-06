@@ -25,6 +25,9 @@ void _start()
 				printf("Command not found\n");
 			exit(1);
 		}
+		else if (child_pid < 0) {
+			printf("Cannot create process\n");
+		}
 		else {
 			wait(child_pid);
 		}
