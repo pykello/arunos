@@ -38,7 +38,7 @@ char *strcpy(char *target, const char *source)
 
 /*
  * strlcpy copies source to the target with size n. At most n - 1 characters
- * will be copied and the resulting target will always be null-terminated. The
+ * will be copied; the target is null-terminated when n is nonzero. The
  * function returns strlen(source). If return value is >= n, then truncation
  * occured.
  */
@@ -51,7 +51,8 @@ size_t strlcpy(char *target, const char *source, size_t n)
 		target[i] = source[i];
 		i++;
 	}
-	target[i] = '\0';
+	if (n != 0)
+		target[i] = '\0';
 
 	source_len = strlen(source);
 	return source_len;

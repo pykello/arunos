@@ -16,4 +16,4 @@ with tempfile.TemporaryDirectory() as tmp:
             'lib/stdio/sprintf.c', 'lib/math.c',
             '-o', exe], check=True)
     sp.run([exe], check=True)
-    print('library: input and formatting pass with sanitizers')
+    print('library: input, formatting and string regressions pass with sanitizers')

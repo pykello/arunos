@@ -72,9 +72,24 @@ static int test_tokens(void)
 	return 0;
 }
 
+static int test_copy(void)
+{
+	char target[4] = "xxx";
+	CHECK(strlcpy(target, "hello", 0) == 5 && target[0] == 'x');
+	CHECK(strlcpy(NULL, "hello", 0) == 5);
+	CHECK(strlcpy(target, "hello", 1) == 5 && !target[0]);
+	CHECK(strlcpy(target, "hello", 4) == 5);
+	CHECK(strcmp(target, "hel") == 0);
+	CHECK(strlcpy(target, "abc", 4) == 3);
+	CHECK(strcmp(target, "abc") == 0);
+	CHECK(strlcpy(target, "", 4) == 0 && !target[0]);
+	return 0;
+}
+
 int main(void)
 {
 	int result = test_input();
 	if (!result) result = test_format();
-	return result ? result : test_tokens();
+	if (!result) result = test_tokens();
+	return result ? result : test_copy();
 }
