@@ -28,7 +28,10 @@ static int (*const syscall_handler[])() = {
 };
 
 /* kernel side of system calls. */
-int handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3)
+int handle_syscall(int code, int arg1, int arg2, int arg3)
 {
+	if ((unsigned int)code >=
+	    sizeof(syscall_handler) / sizeof(syscall_handler[0]))
+		return -1;
 	return syscall_handler[code](arg1, arg2, arg3);
 }

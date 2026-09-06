@@ -1,6 +1,6 @@
 #include <lib/syscall.h>
 
-int syscall0(enum SystemCallCode code)
+int syscall0(int code)
 {
 	int result;
 
@@ -11,7 +11,7 @@ int syscall0(enum SystemCallCode code)
 	return result;
 }
 
-int syscall1(enum SystemCallCode code, int arg1)
+int syscall1(int code, int arg1)
 {
 	int result;
 
@@ -23,7 +23,7 @@ int syscall1(enum SystemCallCode code, int arg1)
 	return result;
 }
 
-int syscall2(enum SystemCallCode code, int arg1, int arg2)
+int syscall2(int code, int arg1, int arg2)
 {
 	int result;
 

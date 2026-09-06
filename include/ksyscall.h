@@ -11,6 +11,6 @@
 
 #include <lib/syscall.h>
 
-int handle_syscall(enum SystemCallCode code, int arg1, int arg2, int arg3);
+int handle_syscall(int code, int arg1, int arg2, int arg3);
 
 #endif

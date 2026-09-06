@@ -21,9 +21,9 @@ enum SystemCallCode {
 	SYSCALL_DIR
 };
 
-int syscall0(enum SystemCallCode code);
-int syscall1(enum SystemCallCode code, int arg1);
-int syscall2(enum SystemCallCode code, int arg1, int arg2);
+int syscall0(int code);
+int syscall1(int code, int arg1);
+int syscall2(int code, int arg1, int arg2);
 
 void putch(int c);
 int getch(void);

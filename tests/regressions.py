@@ -52,7 +52,18 @@ def fork_limit():
     print('fork limit: failure returns and freed slots are reusable')
 
 
-CASES = {'early': early_input, 'fork': fork_limit}
+def syscall_numbers():
+    with tempfile.TemporaryDirectory() as tmp:
+        q = Qemu(fixture_disk(tmp, 'tests/syscall_test.c'))
+        try:
+            q.expect('invalid syscall numbers rejected')
+        finally:
+            q.close()
+    print('syscalls: full-width invalid numbers return -1')
+
+
+CASES = {'early': early_input, 'fork': fork_limit,
+         'syscalls': syscall_numbers}
 if __name__ == '__main__':
     for name in sys.argv[1:] or CASES:
         CASES[name]()
