@@ -1,7 +1,8 @@
 OS = arunos
 
-ifndef arch
-        arch = versatilepb
+arch = versatilepb
+ifneq ($(arch),versatilepb)
+$(error Only arch=versatilepb is supported)
 endif
 
 include arch/$(arch)/config.mk
@@ -38,9 +39,6 @@ $(OS).bin: $(OBJS) $(OS).ld lib/libarunos.a
 	$(LD) -L arch/$(arch) -T $(OS).ld $(OBJS) lib/libarunos.a -o $(OS).elf
 	$(OBJCOPY) -O binary $(OS).elf $(OS).bin
 	$(OBJDUMP) -D $(OS).elf > $(OS).asm
-ifeq ($(arch),raspberrypi)
-	cp arunos.bin /run/media/hadi/boot/kernel.img
-endif
 
 qemu: $(OS).bin 
 	qemu-system-arm $(QEMU_FLAGS) -kernel $(OS).bin

@@ -16,22 +16,12 @@ machine:
     make
     make qemu
 
-The tree also contains a Raspberry Pi target:
-
-    make arch=raspberrypi
-
-That target builds `arunos.bin` for an ARM1176JZF-S CPU. The current Makefile
-also copies the image to `/run/media/hadi/boot/kernel.img` when
-`arch=raspberrypi` is used. If that path does not match your SD-card mount
-point, update or remove the copy step in the Makefile before building.
-
-
 Current Status
 --------------
 
 Arunos currently has:
 
- * ARM startup code for the supported boards,
+ * ARM startup code for the supported board,
  * UART serial I/O,
  * interrupt and timer support,
  * a page allocator and ARM section-table based virtual memory,
@@ -86,7 +76,6 @@ Build the default VersatilePB image:
 Build a specific architecture:
 
     make arch=versatilepb
-    make arch=raspberrypi
 
 The build produces:
 

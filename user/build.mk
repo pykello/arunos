@@ -1,5 +1,5 @@
 USER_CC = arm-none-eabi-gcc
-USER_CFLAGS = -mcpu=arm1176jz-s -marm -g0 \
+USER_CFLAGS = -mcpu=$(CPU) -marm -g0 \
          -std=c99 -pedantic -Wall -Wextra -msoft-float -fPIC -mapcs-frame \
          -fno-builtin-printf -fno-builtin-strcpy -nostdinc -nostdlib \
          -Iinclude
