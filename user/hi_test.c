@@ -7,7 +7,7 @@ void _start()
 	printf("%s %s %d\n", "hello", "world", 1);
 
 	printf("Please enter a string: ");
-	gets(s);
+	gets(s, sizeof(s));
 	printf("%s\n", s);
 
 	exit(0);

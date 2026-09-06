@@ -12,7 +12,7 @@
 #include <lib/stdio.h>
 #include <console.h>
 
-#define kgets(buffer) gets_base(kgetch, kputch, buffer)
+#define kgets(buffer, size) gets_base(kgetch, kputch, buffer, size)
 #define kprintf(...) printf_base(kputch, ##__VA_ARGS__)
 
 #endif

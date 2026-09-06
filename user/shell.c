@@ -9,7 +9,7 @@ void _start()
 
 	while (1) {
 		printf("$ ");
-		gets(command);
+		gets(command, sizeof(command));
 		if (!command[0])
 			continue;
 

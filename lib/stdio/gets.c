@@ -5,13 +5,15 @@
 
 /*
  * gets_base reads a line from the input and puts it as a null terminated
- * string in the given buffer. It returns the pointer buffer as the return value.
+ * string within size bytes. Excess input is discarded through end-of-line.
  */
 char *
-gets_base(int (*getch)(void), void (*putch)(int), char *buffer)
+gets_base(int (*getch)(void), void (*putch)(int), char *buffer, size_t size)
 {
-	int buffer_index = 0;
+	size_t buffer_index = 0;
 	int next_char = 0;
+	if (!buffer || !size)
+		return NULL;
 	while (next_char != '\r' && next_char != '\n') {
 		next_char = getch();
 		if (next_char == 0)
@@ -28,7 +30,8 @@ gets_base(int (*getch)(void), void (*putch)(int), char *buffer)
 				buffer_index--;
 			}
 		}
-		else if (next_char >= 32 && next_char < 128) {
+		else if (next_char >= 32 && next_char < 128 &&
+			 buffer_index < size - 1) {
 			putch(next_char);
 
 			buffer[buffer_index] = next_char;

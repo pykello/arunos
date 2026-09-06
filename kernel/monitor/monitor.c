@@ -22,7 +22,7 @@ void monitor(void)
 		command_handler handler = NULL;
 		
 		kprintf("K> ");
-		kgets(command_string);
+		kgets(command_string, sizeof(command_string));
 
 		tokenize_command(command_string, &argc, argv);
 		if (argc == 0)
