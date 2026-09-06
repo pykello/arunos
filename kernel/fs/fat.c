@@ -98,23 +98,60 @@ static bool short_name(const char *name, char key[11])
 	return true;
 }
 
-bool fat_open(const char *name, struct FatFile *file)
+/* Return the next regular file slot, zero at EOF, or -1 on error. */
+static int root_entry(uint32_t cursor, uint8_t entry[32])
 {
 	uint8_t sector[512];
+	uint32_t i;
+
+	if (!mounted || cursor > root_entries)
+		return -1;
+	for (i = cursor; i < root_entries; i++) {
+		uint8_t *raw = sector + (i % 16) * 32;
+		if ((i == cursor || i % 16 == 0) &&
+		    !block_read(root_start + i / 16, sector))
+			return -1;
+		if (!raw[0])
+			return 0;
+		/* Skip deleted entries, long names, labels and directories. */
+		if (raw[0] == 0xe5 || (raw[11] & 0x18))
+			continue;
+		memcpy(entry, raw, 32);
+		return i + 1;
+	}
+	return 0;
+}
+
+int fat_next(uint32_t cursor, char name[13])
+{
+	uint8_t entry[32];
+	uint32_t i, n = 0;
+	int next = root_entry(cursor, entry);
+
+	if (next <= 0)
+		return next;
+	for (i = 0; i < 8 && entry[i] != ' '; i++)
+		name[n++] = entry[i];
+	if (entry[8] != ' ') {
+		name[n++] = '.';
+		for (i = 8; i < 11 && entry[i] != ' '; i++)
+			name[n++] = entry[i];
+	}
+	name[n] = 0;
+	return next;
+}
+
+bool fat_open(const char *name, struct FatFile *file)
+{
+	uint8_t entry[32];
 	char key[11];
-	uint32_t i, j, count;
+	uint32_t j, count;
+	int cursor = 0;
 	uint16_t cluster;
 
 	if (!mounted || !short_name(name, key))
 		return false;
-	for (i = 0; i < root_entries; i++) {
-		uint8_t *entry = sector + (i % 16) * 32;
-		if (i % 16 == 0 && !block_read(root_start + i / 16, sector))
-			return false;
-		if (!entry[0])
-			return false;
-		if (entry[0] == 0xe5 || (entry[11] & 0x18))
-			continue;
+	while ((cursor = root_entry(cursor, entry)) > 0) {
 		for (j = 0; j < 11 && entry[j] == (uint8_t)key[j]; j++);
 		if (j != 11)
 			continue;

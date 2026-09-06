@@ -60,9 +60,19 @@ with tempfile.TemporaryDirectory() as tmp:
     bad = tmp / 'bad.elf'
     bad.write_bytes(b'not an elf')
     sp.run(['mcopy', '-i', str(disk), str(bad), '::bad.elf'], check=True)
+    notes = tmp / 'notes.txt'
+    notes.write_text('A root file, not a program.\n')
+    sp.run(['mcopy', '-i', str(disk), str(notes), '::notes.txt'], check=True)
     q = Qemu(disk)
     try:
         q.expect('$ ')
+        for command in ['ls', 'dir']:
+            q.send(command)
+            lines = q.expect('$ ').decode().splitlines()
+            assert lines == [command, 'SHELL', 'HI_TEST', 'FK_TEST',
+                             'EX_TEST', 'CO_TEST', 'CHECK.ELF', 'BAD.ELF',
+                             'NOTES.TXT'], lines
+        q.send('notes.txt'); q.expect('Command not found'); q.expect('$ ')
         q.send('Hi_TeSt'); q.expect('Please enter a string: ')
         q.send('disk hello'); q.expect('disk hello\r\n'); q.expect('$ ')
         q.send('fk_test'); q.expect('hello from pid:'); q.expect('hello from pid:')
@@ -85,7 +95,7 @@ with tempfile.TemporaryDirectory() as tmp:
         q.send('bad.elf'); q.expect('Command not found'); q.expect('$ ')
     finally:
         q.close()
-    print('QEMU: shell, hello, fork, exec, concurrency, BSS, repeated exec pass')
+    print('QEMU: ls/dir, named demos, unknown commands, BSS and repeated exec pass')
 
     # Change only the disk: hi_test must now execute the test ELF.
     sp.run(['mcopy', '-o', '-i', str(disk), str(elf), '::hi_test'], check=True)

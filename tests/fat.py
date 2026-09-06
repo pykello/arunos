@@ -19,6 +19,7 @@ with tempfile.TemporaryDirectory() as tmp:
             'kernel/fs/fat.c', 'lib/math.c', 'tests/fat_disk.c',
             '-o', str(so)], check=True)
     lib = c.CDLL(str(so))
+    lib.fat_next.argtypes = [c.c_uint32, c.c_void_p]
     lib.fat_open.argtypes = [c.c_char_p, c.POINTER(File)]
     lib.fat_read.argtypes = [c.POINTER(File), c.c_uint32,
                              c.c_void_p, c.c_uint32]
@@ -50,6 +51,42 @@ with tempfile.TemporaryDirectory() as tmp:
     reserved = struct.unpack_from('<H', b, 14)[0]
     fat_size = struct.unpack_from('<H', b, 22)[0]
     root = (reserved + b[16] * fat_size) * 512
+    def listing():
+        cursor, names = 0, []
+        while True:
+            name = c.create_string_buffer(13)
+            cursor = lib.fat_next(cursor, name)
+            assert cursor >= 0
+            if cursor == 0:
+                return names
+            names.append(name.value)
+
+    expected_names = [b'SHELL', b'HI_TEST', b'FK_TEST', b'EX_TEST', b'CO_TEST']
+    assert listing() == expected_names
+    # Skip deleted/long-name/label/directory entries across a sector edge.
+    for slot in range(5, 16):
+        entry = bytearray(32)
+        entry[:11] = b'SKIPPED    '
+        entry[11] = [0x0f, 0x08, 0x10, 0x20][slot % 4]
+        if entry[11] == 0x20:
+            entry[0] = 0xe5
+        os.pwrite(fd, entry, root + slot * 32)
+    entry = bytearray(32)
+    entry[:11] = b'ABCDEFGHXYZ'
+    entry[11] = 0x02  # Hidden regular files still belong in the listing.
+    os.pwrite(fd, entry, root + 16 * 32)
+    assert listing() == expected_names + [b'ABCDEFGH.XYZ']
+    assert lib.fat_open(b'abcdefgh.xyz', c.byref(File()))
+    assert lib.fat_next(0xffffffff, c.create_string_buffer(13)) == -1
+    root_entries = struct.unpack_from('<H', b, 17)[0]
+    assert lib.fat_next(root_entries, c.create_string_buffer(13)) == 0
+    lib.test_disk(fd, 0)
+    assert lib.fat_next(0, c.create_string_buffer(13)) == -1
+    lib.test_disk(fd, len(original) // 512)
+    os.pwrite(fd, original, 0)
+    os.pwrite(fd, bytes(32), root)
+    assert listing() == []
+    os.pwrite(fd, original, 0)
     cluster = struct.unpack_from('<H', original, root + 26)[0]
     fat_offset = reserved * 512 + cluster * 2
     # Reverse physical cluster order while preserving logical file contents.
@@ -91,4 +128,4 @@ with tempfile.TemporaryDirectory() as tmp:
         os.pwrite(fd, struct.pack('<H', next_cluster), fat_offset)
         assert not lib.fat_open(b'shell', c.byref(File()))
     os.close(fd)
-    print('FAT: contents, fragmentation, unaligned reads, EOF, bad BPB/chains pass')
+    print('FAT: listing, names, contents, fragmentation, EOF and corrupt media pass')

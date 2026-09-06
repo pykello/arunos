@@ -28,7 +28,7 @@ Arunos currently has:
  * a small process table and scheduler,
  * a polling virtio block driver and read-only FAT16 filesystem,
  * ELF loading from disk,
- * basic system calls: putch, getch, exit, getpid, fork, exec, yield, wait,
+ * basic system calls: putch, getch, exit, getpid, fork, exec, yield, wait, dir,
  * a small user-space library with string, stdio, math, and syscall helpers,
  * a kernel monitor implementation with diagnostic commands.
 
@@ -42,6 +42,10 @@ the console, mounts `disk.img`, then starts `SHELL`, built from
  * `fk_test`: fork test
  * `ex_test`: exec test
  * `co_test`: concurrency test
+
+Type `ls` or `dir` to list the root files, then type a filename to run it.
+Demo source files use the same names (for example, `user/co_test.c`).
+Unknown commands print `Command not found` and return to the prompt.
 
 The kernel monitor code provides these commands when entered by kernel code:
 
@@ -114,7 +118,8 @@ Disk and ELF Scope
 
 Storage intentionally supports one disk, synchronous 512-byte reads, and
 FAT16 starting at sector zero. Files must use root-directory 8.3 names;
-there are no partitions, subdirectories, long names, writes, or file syscalls.
+there are no partitions, subdirectories, long names, writes, or file handles.
+The `dir()` syscall prints the root files and returns -1 on a read error.
 `exec(name)` loads that root filename and returns -1 on failure. There is
 no numeric exec interface or program table. Filenames are case-insensitive
 ASCII 8.3 names; an extension is optional and must be supplied when present.
@@ -137,9 +142,9 @@ Run the host FAT tests and QEMU boot/process tests:
 
     make test
 
-Tests cover file contents and fragmentation, invalid filesystem metadata,
-malformed ELF headers, BSS, failed exec, disk-only replacement, and the
-existing hello, fork, exec, and concurrency programs.
+Tests cover root listings and names, file contents and fragmentation,
+invalid filesystem metadata, malformed ELF headers, BSS, failed exec,
+disk-only replacement, and all four demo programs.
 
 
 Debugging

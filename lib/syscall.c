@@ -75,3 +75,8 @@ void wait(int id)
 {
 	syscall1(SYSCALL_WAIT, id);
 }
+
+int dir(void)
+{
+	return syscall0(SYSCALL_DIR);
+}
