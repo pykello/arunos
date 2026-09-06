@@ -6,27 +6,33 @@ SECTIONS
 {
 	. = 0x80000000 + start_address;
 
-	.text : AT(start_address) { *(.text) }
+	.text : AT(start_address) { *(.text .text.*) }
 	PROVIDE(etext = .);
 
-	.stab : {
+	.rodata : AT(ADDR(.rodata) - 0x80000000) {
+		*(.rodata .rodata.*)
+	}
+
+	.stab : AT(ADDR(.stab) - 0x80000000) {
 		PROVIDE(STAB_BEGIN = .);
 		*(.stab);
 		PROVIDE(STAB_END = .);
 		BYTE(0);
 	}
 	
-	.stabstr : {
+	.stabstr : AT(ADDR(.stabstr) - 0x80000000) {
 		PROVIDE(STABSTR_BEGIN = .);
 		*(.stabstr);
 		PROVIDE(STABSTR_END = .);
 		BYTE(0);
 	}
 
-	.data : { *(.data) }
+	.data : AT(ADDR(.data) - 0x80000000) {
+		*(.data .data.* .got .got.*)
+	}
 	PROVIDE(edata = .);
 
-	.bss : { *(.bss COMMON) }
+	.bss : AT(ADDR(.bss) - 0x80000000) { *(.bss .bss.* COMMON) }
 	. = ALIGN(8);
 
 	. = . + 0x1000; /* 4kB of stack memory */
