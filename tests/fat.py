@@ -28,11 +28,10 @@ with tempfile.TemporaryDirectory() as tmp:
     lib.test_disk(fd, image.stat().st_size // 512)
     original = image.read_bytes()
     assert lib.fat_init()
-    assert not lib.fat_open(b'MISSING ELF', c.byref(File()))
-    for i, name in enumerate(['shell', 'hello', 'fork_test', 'exec_test',
-                              'concurrency_test']):
+    assert not lib.fat_open(b'missing', c.byref(File()))
+    for name in ['shell', 'hi_test', 'fk_test', 'ex_test', 'co_test']:
         f = File()
-        assert lib.fat_open(f'{i:<8}ELF'.encode(), c.byref(f))
+        assert lib.fat_open(name.encode(), c.byref(f))
         expected = Path('user', name).read_bytes()
         assert f.size == len(expected)
         for offset, length in [(0, f.size), (509, 1050),
@@ -41,6 +40,12 @@ with tempfile.TemporaryDirectory() as tmp:
             assert lib.fat_read(c.byref(f), offset, buf, length)
             assert buf.raw == expected[offset:offset + length]
         assert not lib.fat_read(c.byref(f), f.size, c.create_string_buffer(1), 1)
+    for name in [b'SHELL', b'ShElL']:
+        assert lib.fat_open(name, c.byref(File()))
+    for name in [None, b'', b'.', b'..', b'shell.', b'/shell',
+                 b'shell/x', b'123456789', b'shell.abcd', b'a.b.c',
+                 b'sh ell', b'sh*ll', b'sh?ll', b'1']:
+        assert not lib.fat_open(name, c.byref(File())), name
     b = original[:512]
     reserved = struct.unpack_from('<H', b, 14)[0]
     fat_size = struct.unpack_from('<H', b, 22)[0]
@@ -66,7 +71,7 @@ with tempfile.TemporaryDirectory() as tmp:
         os.pwrite(fd, struct.pack('<H', successor), reserved * 512 + new * 2)
     os.pwrite(fd, struct.pack('<H', reordered[0]), root + 26)
     f = File()
-    assert lib.fat_open(b'0       ELF', c.byref(f))
+    assert lib.fat_open(b'shell', c.byref(f))
     buf = c.create_string_buffer(f.size)
     assert lib.fat_read(c.byref(f), 0, buf, f.size)
     assert buf.raw == Path('user/shell').read_bytes()
@@ -84,6 +89,6 @@ with tempfile.TemporaryDirectory() as tmp:
     assert lib.fat_init()
     for next_cluster in [0, 1, 0xfff7, 0xffff, cluster]:
         os.pwrite(fd, struct.pack('<H', next_cluster), fat_offset)
-        assert not lib.fat_open(b'0       ELF', c.byref(File()))
+        assert not lib.fat_open(b'shell', c.byref(File()))
     os.close(fd)
     print('FAT: contents, fragmentation, unaligned reads, EOF, bad BPB/chains pass')

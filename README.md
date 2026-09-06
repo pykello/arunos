@@ -33,15 +33,15 @@ Arunos currently has:
  * a kernel monitor implementation with diagnostic commands.
 
 On boot, the kernel initializes memory, virtual memory, process management, and
-the console, mounts `disk.img`, then starts `0.ELF`, built from
-`user/shell.c`. The user shell prompts with `$` and runs disk ELF files by
-numeric index:
+the console, mounts `disk.img`, then starts `SHELL`, built from
+`user/shell.c`. The user shell prompts with `$` and runs root files by name
+(case-insensitive):
 
- * `0`: shell
- * `1`: hello
- * `2`: fork_test
- * `3`: exec_test
- * `4`: concurrency_test
+ * `shell`: shell
+ * `hi_test`: hello demo
+ * `fk_test`: fork test
+ * `ex_test`: exec test
+ * `co_test`: concurrency test
 
 The kernel monitor code provides these commands when entered by kernel code:
 
@@ -50,7 +50,7 @@ The kernel monitor code provides these commands when entered by kernel code:
  * `hextee`: echo input bytes as hexadecimal until `q`,
  * `kerninfo`: print kernel symbol and footprint information,
  * `status`: print CPU, register, and memory status,
- * `execute <n>`: create a process and run `<n>.ELF` from the disk.
+ * `execute <name>`: create a process and run a file from the disk.
 
 
 Building
@@ -85,8 +85,8 @@ The build produces:
  * `arunos.bin`: raw boot image,
  * `arunos.elf`: ELF image with symbols,
  * `arunos.asm`: disassembly,
- * `disk.img`: 16 MiB FAT16 disk containing `0.ELF` through `4.ELF`,
- * `user/shell`, `user/hello`, etc.: standalone user ELF files.
+ * `disk.img`: 16 MiB FAT16 disk containing the named user programs,
+ * `user/shell`, `user/hi_test`, etc.: standalone user ELF files.
 
 Clean generated files with:
 
@@ -115,19 +115,20 @@ Disk and ELF Scope
 Storage intentionally supports one disk, synchronous 512-byte reads, and
 FAT16 starting at sector zero. Files must use root-directory 8.3 names;
 there are no partitions, subdirectories, long names, writes, or file syscalls.
-`exec(n)` loads `n.ELF` for indices 0 through 9 and returns -1 on failure.
-The image builder installs programs 0 through 4; the other names are optional.
+`exec(name)` loads that root filename and returns -1 on failure. There is
+no numeric exec interface or program table. Filenames are case-insensitive
+ASCII 8.3 names; an extension is optional and must be supplied when present.
 
 ELFs must be static little-endian ARM32 executables, with at most 16 program
 headers and load segments below 1 MiB. The loader reads segments directly
 from the filesystem and zeroes BSS. It stages a replacement in a spare
 process slot so failure preserves the caller; exec needs one free slot.
-A missing disk, invalid filesystem, or unusable `0.ELF` stops boot with a
+A missing disk, invalid filesystem, or unusable `SHELL` stops boot with a
 serial error message.
 
 To replace a program without rebuilding the kernel (with QEMU stopped):
 
-    mcopy -o -i disk.img user/hello ::1.elf
+    mcopy -o -i disk.img user/hi_test ::hi_test
 
 `make` rebuilds the disk when a user program changes. `make clean` removes
 it, including any manual changes.

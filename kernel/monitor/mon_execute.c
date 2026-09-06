@@ -9,14 +9,10 @@
 #include <system.h>
 #include <types.h>
 
-/*
- * mon_execute executes a user program. It gets the index of a user program
- * and executes it.
- */
+/* Execute a root-directory program by filename. */
 int mon_execute(int argc, char **argv)
 {
 	struct Process *proc = NULL;
-	int program_index = 0;
 	bool loaded = false;
 
 	if (argc < 2) {
@@ -24,9 +20,8 @@ int mon_execute(int argc, char **argv)
 		return -1;
 	}
 
-	program_index = argv[1][0] - '0';
 	proc = proc_create();
-	loaded = proc_load_program(proc, program_index);
+	loaded = proc_load_program(proc, argv[1]);
 
 	if (loaded)
 		schedule();

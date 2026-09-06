@@ -56,37 +56,42 @@ with tempfile.TemporaryDirectory() as tmp:
             '-Iinclude', '-c', 'tests/elf_test.c', '-o', str(obj)], check=True)
     sp.run(['arm-none-eabi-ld', '-Ttext=100', str(obj), 'lib/libarunos.a',
             '-o', str(elf)], check=True)
-    sp.run(['mcopy', '-i', str(disk), str(elf), '::5.elf'], check=True)
+    sp.run(['mcopy', '-i', str(disk), str(elf), '::check.elf'], check=True)
     bad = tmp / 'bad.elf'
     bad.write_bytes(b'not an elf')
-    sp.run(['mcopy', '-i', str(disk), str(bad), '::6.elf'], check=True)
+    sp.run(['mcopy', '-i', str(disk), str(bad), '::bad.elf'], check=True)
     q = Qemu(disk)
     try:
         q.expect('$ ')
-        q.send('1'); q.expect('Please enter a string: ')
+        q.send('Hi_TeSt'); q.expect('Please enter a string: ')
         q.send('disk hello'); q.expect('disk hello\r\n'); q.expect('$ ')
-        q.send('2'); q.expect('hello from pid:'); q.expect('hello from pid:')
+        q.send('fk_test'); q.expect('hello from pid:'); q.expect('hello from pid:')
         q.expect('$ ')
-        q.send('3'); q.expect('Please enter a string: ')
+        q.send('ex_test'); q.expect('Please enter a string: ')
         q.send('nested exec'); q.expect('$ ')
-        q.send('4')
-        q.expect('step 49999 at pid', timeout=45)
-        q.expect('step 49999 at pid', timeout=45); q.expect('$ ')
+        q.send('co_test')
+        output = q.expect('step 49999 at pid', timeout=45)
+        output += q.expect('step 49999 at pid', timeout=45)
+        # The shell waits for its child, not that child's forked process.
+        # Its prompt can arrive before the second process finishes.
+        if b'$ ' not in output:
+            q.expect('$ ')
         for _ in range(12):
-            q.send('5')
+            q.send('check.elf')
             q.expect('ELF data/BSS and failed exec preserved caller')
             q.expect('$ ')
-        q.send('9'); q.expect('cannot execute 9'); q.expect('$ ')
-        q.send('6'); q.expect('cannot execute 6'); q.expect('$ ')
+        q.send('1'); q.expect('Command not found'); q.expect('$ ')
+        q.send('missing'); q.expect('Command not found'); q.expect('$ ')
+        q.send('bad.elf'); q.expect('Command not found'); q.expect('$ ')
     finally:
         q.close()
     print('QEMU: shell, hello, fork, exec, concurrency, BSS, repeated exec pass')
 
-    # Change only the disk: program 1 must now execute the test ELF.
-    sp.run(['mcopy', '-o', '-i', str(disk), str(elf), '::1.elf'], check=True)
+    # Change only the disk: hi_test must now execute the test ELF.
+    sp.run(['mcopy', '-o', '-i', str(disk), str(elf), '::hi_test'], check=True)
     q = Qemu(disk)
     try:
-        q.expect('$ '); q.send('1')
+        q.expect('$ '); q.send('hi_test')
         q.expect('ELF data/BSS and failed exec preserved caller')
     finally:
         q.close()
@@ -105,10 +110,10 @@ with tempfile.TemporaryDirectory() as tmp:
     finally:
         q.close()
     disk.write_bytes(original)
-    sp.run(['mdel', '-i', str(disk), '::0.elf'], check=True)
+    sp.run(['mdel', '-i', str(disk), '::shell'], check=True)
     q = Qemu(disk)
     try:
-        q.expect('boot: cannot load 0.ELF')
+        q.expect('boot: cannot load SHELL')
     finally:
         q.close()
 
@@ -123,11 +128,11 @@ with tempfile.TemporaryDirectory() as tmp:
         damaged = source.copy()
         damaged[offset:offset + len(value)] = value
         bad.write_bytes(damaged)
-        sp.run(['mcopy', '-o', '-i', str(disk), str(bad), '::0.elf'],
+        sp.run(['mcopy', '-o', '-i', str(disk), str(bad), '::shell'],
                check=True)
         q = Qemu(disk)
         try:
-            q.expect('boot: cannot load 0.ELF')
+            q.expect('boot: cannot load SHELL')
         finally:
             q.close()
     print('QEMU: missing disk/file, bad filesystem and malformed ELFs pass')

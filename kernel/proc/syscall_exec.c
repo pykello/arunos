@@ -75,18 +75,14 @@ static bool load_elf(struct Process *proc, const struct FatFile *file)
 }
 
 /* Load privately so missing files and read errors preserve the caller. */
-bool proc_load_program(struct Process *proc, int program_index)
+bool proc_load_program(struct Process *proc, const char *name)
 {
-	char name[] = "0       ELF";
 	struct FatFile file;
 	struct Process *image;
 	uint32_t i, old_heap;
 	char *old_kernel_stack, *old_user_stack;
 
-	if (!proc || program_index < 0 || program_index > 9)
-		return false;
-	name[0] += program_index;
-	if (!fat_open(name, &file))
+	if (!proc || !fat_open(name, &file))
 		return false;
 	image = proc_create();
 	if (!image)
@@ -117,9 +113,26 @@ bool proc_load_program(struct Process *proc, int program_index)
 	return true;
 }
 
-int syscall_exec(int id)
+int syscall_exec(const char *user_name)
 {
-	if (proc_load_program(current_process, id))
-		proc_start(current_process);
+	char name[13];
+	uint32_t i, addr = (uint32_t)user_name;
+
+	if (!addr)
+		return -1;
+	for (i = 0; i < sizeof(name); i++, addr++) {
+		/* Only the user heap and stack contain readable user pages. */
+		if (addr >= current_process->heap_size &&
+		    (addr < USER_STACK_BOTTOM ||
+		     addr >= USER_STACK_BOTTOM + PAGE_SIZE))
+			return -1;
+		name[i] = *(char *)P2V(resolve_physical_address(
+					current_process->vm, addr));
+		if (!name[i]) {
+			if (proc_load_program(current_process, name))
+				proc_start(current_process);
+			return -1;
+		}
+	}
 	return -1;
 }

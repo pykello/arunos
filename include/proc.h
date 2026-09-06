@@ -114,13 +114,13 @@ void schedule(void);
 void dump_scheduler_status(void);
 
 /* syscall_exec.c */
-bool proc_load_program(struct Process *proc, int program_index);
+bool proc_load_program(struct Process *proc, const char *name);
 
 /* system calls */
 int syscall_exit(int arg1);
 int syscall_getpid(void);
 int syscall_fork(void);
-int syscall_exec(int id);
+int syscall_exec(const char *name);
 int syscall_yield(void);
 int syscall_wait(int id);
 

@@ -3,6 +3,7 @@
 
 static volatile unsigned char bss[9000];
 static volatile int data = 123;
+static char long_name[13] = "12345678.ELFX";
 
 void _start(void)
 {
@@ -13,8 +14,11 @@ void _start(void)
 			printf("BSS FAIL\n");
 			exit(1);
 		}
-	if (data != 123 || exec(-1) != -1 || exec(10) != -1 ||
-	    exec(9) != -1 || exec(6) != -1) {
+	if (data != 123 || exec((char *)0) != -1 ||
+	    exec((char *)0x80000000) != -1 ||
+	    exec((char *)0x10000000) != -1 ||
+	    exec(long_name) != -1 || exec("missing") != -1 ||
+	    exec("bad.elf") != -1 || syscall1(SYSCALL_EXEC, 1) != -1) {
 		printf("EXEC FAIL\n");
 		exit(1);
 	}

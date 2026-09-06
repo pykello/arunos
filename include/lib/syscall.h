@@ -29,7 +29,7 @@ int getch(void);
 void exit(int code);
 int getpid(void);
 int fork(void);
-int exec(int id);
+int exec(const char *name);
 void yield(void);
 void wait(int id);
 

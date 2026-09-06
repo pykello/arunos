@@ -71,13 +71,41 @@ bool fat_init(void)
 	return true;
 }
 
-bool fat_open(const char name[11], struct FatFile *file)
+/* Convert a plain ASCII 8.3 filename to its on-disk padded form. */
+static bool short_name(const char *name, char key[11])
+{
+	uint32_t i = 0, pos = 0, limit = 8;
+
+	if (!name || !name[0])
+		return false;
+	memset(key, ' ', 11);
+	for (; name[i]; i++) {
+		unsigned char ch = name[i];
+		if (ch == '.') {
+			if (!pos || limit == 11 || !name[i + 1])
+				return false;
+			pos = 8;
+			limit = 11;
+			continue;
+		}
+		if (pos == limit || ch <= ' ' || ch >= 127 ||
+		    strchr("\"*+,/:;<=>?[\\]|", ch))
+			return false;
+		if (ch >= 'a' && ch <= 'z')
+			ch -= 'a' - 'A';
+		key[pos++] = ch;
+	}
+	return true;
+}
+
+bool fat_open(const char *name, struct FatFile *file)
 {
 	uint8_t sector[512];
+	char key[11];
 	uint32_t i, j, count;
 	uint16_t cluster;
 
-	if (!mounted)
+	if (!mounted || !short_name(name, key))
 		return false;
 	for (i = 0; i < root_entries; i++) {
 		uint8_t *entry = sector + (i % 16) * 32;
@@ -87,7 +115,7 @@ bool fat_open(const char name[11], struct FatFile *file)
 			return false;
 		if (entry[0] == 0xe5 || (entry[11] & 0x18))
 			continue;
-		for (j = 0; j < 11 && entry[j] == (uint8_t)name[j]; j++);
+		for (j = 0; j < 11 && entry[j] == (uint8_t)key[j]; j++);
 		if (j != 11)
 			continue;
 		file->size = le32(entry + 28);

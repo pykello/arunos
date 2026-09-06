@@ -30,8 +30,8 @@ void c_entry(void)
 	/* start the first program */
 	{
 		struct Process *proc = proc_create();
-		if (!proc_load_program(proc, 0)) {
-			kprintf("boot: cannot load 0.ELF\n");
+		if (!proc_load_program(proc, "shell")) {
+			kprintf("boot: cannot load SHELL\n");
 			while (1);
 		}
 		scheduler_init();
