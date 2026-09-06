@@ -12,7 +12,7 @@ save_context_1:
 	pop {r1-r12, r14}
 
 	/* if no process is active, return */
-	cmpeq r0, #0
+	cmp r0, #0
 	beq save_context_return
 
 	/* store cpsr */
@@ -44,7 +44,7 @@ save_context_2:
 	pop {r1-r12, r14}
 
 	/* if no process is active, return */
-	cmpeq r0, #0
+	cmp r0, #0
 	beq save_context_return
 
 	/* store r0 */

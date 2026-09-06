@@ -141,7 +141,7 @@ void proc_start(struct Process *proc)
 
 int *get_current_context(void)
 {
-	return current_process->context;
+	return current_process ? current_process->context : NULL;
 }
 
 struct Process *proc_get(int pid)

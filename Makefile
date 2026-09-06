@@ -53,3 +53,4 @@ clean:
 test: all
 	python3 tests/fat.py
 	python3 tests/boot.py
+	python3 tests/regressions.py

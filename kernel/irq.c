@@ -11,8 +11,8 @@ interrupt_handler interrupt_handler_vector[IRQ_COUNT] = {0};
  */
 void register_interrupt_handler(int interrupt_line, interrupt_handler handler)
 {
-	enable_irq_line(interrupt_line);
 	interrupt_handler_vector[interrupt_line] = handler;
+	enable_irq_line(interrupt_line);
 }
 
 /*
