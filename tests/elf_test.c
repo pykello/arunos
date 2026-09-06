@@ -8,6 +8,16 @@ static char long_name[13] = "12345678.ELFX";
 void _start(void)
 {
 	unsigned int i;
+	volatile unsigned char *stack = (void *)0x7fffd000;
+
+	/* Leave the active frames at the top of the page alone. */
+	for (i = 0; i < 2048; i++) {
+		if (stack[i]) {
+			printf("STACK FAIL\n");
+			exit(1);
+		}
+		stack[i] = 0xa5;
+	}
 
 	for (i = 0; i < sizeof(bss); i++)
 		if (bss[i] != 0) {

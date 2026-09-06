@@ -43,6 +43,8 @@ struct Process *proc_create(void)
 
 	kernel_stack = kalloc();
 	user_stack = kalloc();
+	memset(kernel_stack, 0, PAGE_SIZE);
+	memset(user_stack, 0, PAGE_SIZE);
 
 	vm = process_vm[pid - 1];
 	memset(vm, 0, SECTION_TABLE_SIZE);
