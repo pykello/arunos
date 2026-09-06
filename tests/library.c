@@ -36,7 +36,28 @@ static int test_input(void)
 	return 0;
 }
 
+static char printed[1024];
+static int printed_size;
+static void capture(int ch) { printed[printed_size++] = ch; }
+
+static int test_format(void)
+{
+	char long_string[601], formatted[80];
+	memset(long_string, 'x', 600); long_string[600] = 0;
+	CHECK(printf_base(capture, "%s", long_string) == 600);
+	CHECK(printed_size == 600);
+	for (int i = 0; i < 600; i++) CHECK(printed[i] == 'x');
+	printed_size = 0;
+	CHECK(sprintf(formatted, "%d %u %x %c %%", (-2147483647 - 1),
+	              4294967295u, 0xabu, 'z') == 31);
+	CHECK(strcmp(formatted, "-2147483648 4294967295 0xab z %") == 0);
+	CHECK(printf_base(capture, "a%cb", 0) == 3);
+	CHECK(printed_size == 3 && !printed[1] && printed[2] == 'b');
+	return 0;
+}
+
 int main(void)
 {
-	return test_input();
+	int result = test_input();
+	return result ? result : test_format();
 }

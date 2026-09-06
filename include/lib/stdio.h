@@ -18,6 +18,8 @@
 char *gets_base(int (*getch)(void), void (*putch)(int), char *buffer, size_t size);
 int printf_base(void (*putch)(int), const char *format, ...);
 int sprintf(char *target, const char *format, ...);
+int vprintf_base(void (*emit)(int, void *), void *context,
+                 const char *format, va_list ap);
 int vsprintf(char *target, const char *format, va_list ap);
 
 #define gets(buffer, size) gets_base(getch, putch, buffer, size)
