@@ -55,3 +55,4 @@ test: all
 	python3 tests/boot.py
 	python3 tests/regressions.py
 	python3 tests/library.py
+	python3 tests/allocator.py
