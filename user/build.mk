@@ -27,3 +27,15 @@ user/user_programs.c: user/base16 $(USER_PROGRAMS)
 		user/base16 < $$program >> $@; \
 	done
 	echo "{0}};" >> $@
+
+# A small FAT16 superfloppy; numeric filenames preserve the exec ABI.
+disk.img: $(USER_PROGRAMS)
+	rm -f $@.tmp
+	truncate -s 16M $@.tmp
+	mkfs.fat -F 16 -s 2 $@.tmp
+	@set -e; i=0; for program in $(USER_PROGRAMS); do \
+		mcopy -i $@.tmp $$program ::$$i.elf; i=$$((i + 1)); \
+	done
+	mv $@.tmp $@
+
+EXTRA_CLEAN += disk.img disk.img.tmp

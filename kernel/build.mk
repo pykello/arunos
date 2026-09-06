@@ -10,3 +10,5 @@ OBJS += $(KERNEL_DIR)/system.o
 include $(KERNEL_DIR)/memory/build.mk
 include $(KERNEL_DIR)/monitor/build.mk
 include $(KERNEL_DIR)/proc/build.mk
+
+OBJS += $(KERNEL_DIR)/fs/fat.o
