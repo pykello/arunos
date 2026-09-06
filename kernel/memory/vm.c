@@ -14,12 +14,15 @@ static void map_page(struct SectionTableEntry *vm, uint32_t physical,
 static struct MemoryMapping kernel_mappings[] = {
 	{KERNEL_BASE, 0, V2P(kernel_end), AP_RW_D},
 	{MMIO_BASE, MMIO_BASE_PHYSICAL, MMIO_BASE_PHYSICAL + 0x400000, AP_RW_D},
+	{0xd0000000, 0x42000000, 0x42010000, AP_RW_D},
+	{0xd0010000, 0x43001000, 0x43002000, AP_RW_D},
 	{INTERRUPT_VECTOR_BASE, 0, PAGE_SIZE, AP_RW_D},
 	{ALLOCATABLE_MEMORY_START, V2P(ALLOCATABLE_MEMORY_START),
 		TOTAL_MEMORY_SIZE, AP_RW_D}
 };
 
-const int kernel_mapping_count = 4;
+const int kernel_mapping_count =
+	sizeof(kernel_mappings) / sizeof(kernel_mappings[0]);
 
 struct SectionTableEntry *kernel_vm = NULL;
 
