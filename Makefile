@@ -16,7 +16,7 @@ OBJCOPY = arm-none-eabi-objcopy
 OBJDUMP = arm-none-eabi-objdump
 
 # flags
-CFLAGS = -mcpu=$(CPU) -gstabs -I include -I arch/$(arch)/include -marm \
+CFLAGS = -mcpu=$(CPU) -g -I include -I arch/$(arch)/include -marm \
          -std=c99 -pedantic -Wall -Wextra -msoft-float -fPIC -mapcs-frame \
          -fno-builtin-printf -fno-builtin-strcpy -Wno-overlength-strings \
          -fno-builtin-exit -MMD -MP
