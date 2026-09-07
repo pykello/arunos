@@ -34,29 +34,43 @@ include lib/build.mk
 include arch/$(arch)/build.mk
 include user/build.mk
 
+%.o: %.c
+	@printf '  Compiling %s\n' '$<'
+	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+%.o: %.S
+	@printf '  Assembling %s\n' '$<'
+	@$(CC) $(ASFLAGS) $(CPPFLAGS) -c -o $@ $<
+
 $(OS).bin: $(OBJS) $(OS).ld arch/$(arch)/linker.ld lib/libarunos.a
-	$(LD) -L arch/$(arch) -T $(OS).ld $(OBJS) lib/libarunos.a -o $(OS).elf
-	$(OBJCOPY) -O binary $(OS).elf $(OS).bin
-	$(OBJDUMP) -D $(OS).elf > $(OS).asm
+	@printf '  Linking %s\n' '$(OS).elf'
+	@$(LD) -L arch/$(arch) -T $(OS).ld $(OBJS) lib/libarunos.a -o $(OS).elf
+	@printf '  Creating kernel image %s\n' '$@'
+	@$(OBJCOPY) -O binary $(OS).elf $(OS).bin
+	@printf '  Writing disassembly %s\n' '$(OS).asm'
+	@$(OBJDUMP) -D $(OS).elf > $(OS).asm
 
 qemu: all
-	qemu-system-arm $(QEMU_FLAGS) -kernel $(OS).bin
+	@printf '  Starting QEMU (Ctrl-A, then X to exit)\n'
+	@qemu-system-arm $(QEMU_FLAGS) -kernel $(OS).bin
 
 qemu-gdb: all
-	qemu-system-arm $(QEMU_FLAGS) -gdb tcp::26000 -S -kernel $(OS).bin
+	@printf '  Starting QEMU, waiting for GDB on port 26000\n'
+	@qemu-system-arm $(QEMU_FLAGS) -gdb tcp::26000 -S -kernel $(OS).bin
 
 clean:
-	rm -f $(OBJS) $(EXTRA_CLEAN) $(DEPS)
-	rm -f $(OS).elf $(OS).bin $(OS).asm
+	@printf '  Removing build artifacts\n'
+	@rm -f $(OBJS) $(EXTRA_CLEAN) $(DEPS)
+	@rm -f $(OS).elf $(OS).bin $(OS).asm
 
 .PHONY: all clean qemu qemu-gdb test
 test: all
-	python3 tests/fat.py
-	python3 tests/boot.py
-	python3 tests/regressions.py
-	python3 tests/library.py
-	python3 tests/allocator.py
-	python3 tests/build.py
+	@python3 tests/fat.py
+	@python3 tests/boot.py
+	@python3 tests/regressions.py
+	@python3 tests/library.py
+	@python3 tests/allocator.py
+	@python3 tests/build.py
 
 DEPS = $(OBJS:.o=.d) $(LIB_OBJS:.o=.d) $(USER_PROGRAMS:%=%.d)
 -include $(DEPS)

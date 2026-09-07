@@ -12,18 +12,22 @@ USER_PROGRAMS = user/shell \
 EXTRA_CLEAN += $(USER_PROGRAMS)
 
 user/%: user/%.c lib/libarunos.a
-	$(USER_CC) $(USER_CFLAGS) -MMD -MP -MF $@.d -MT $@ -c -o $@.o $<
-	$(LD) -Ttext=100 $@.o lib/libarunos.a -o $@
-	rm -f $@.o
+	@printf '  Compiling %s\n' '$<'
+	@$(USER_CC) $(USER_CFLAGS) -MMD -MP -MF $@.d -MT $@ -c -o $@.o $<
+	@printf '  Linking program %s\n' '$@'
+	@$(LD) -Ttext=100 $@.o lib/libarunos.a -o $@
+	@rm -f $@.o
 
 # Short filenames are the shell commands; ELF does not need an extension.
 disk.img: $(USER_PROGRAMS) user/build.mk
-	rm -f $@.tmp
-	truncate -s 16M $@.tmp
-	mkfs.fat -F 16 -s 2 $@.tmp
+	@printf '  Creating FAT16 filesystem %s\n' '$@'
+	@rm -f $@.tmp
+	@truncate -s 16M $@.tmp
+	@mkfs.fat -F 16 -s 2 $@.tmp
 	@set -e; for program in $(USER_PROGRAMS); do \
+		printf '  Adding program %s\n' "$$program"; \
 		mcopy -i $@.tmp $$program ::$${program##*/}; \
 	done
-	mv $@.tmp $@
+	@mv $@.tmp $@
 
 EXTRA_CLEAN += disk.img disk.img.tmp
