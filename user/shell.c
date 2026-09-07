@@ -7,6 +7,13 @@ void _start()
 	char command[128];
 	int child_pid = 0;
 
+	printf("\nArunOS shell\n"
+	       "  ls / dir  - list files in the root directory\n"
+	       "  hi_test   - enter a line and echo it back\n"
+	       "  fk_test   - see fork create a child process\n"
+	       "Run programs by typing their filename, then Enter.\n"
+	       "To exit QEMU, press Ctrl-A, then X.\n\n");
+
 	while (1) {
 		printf("$ ");
 		gets(command, sizeof(command));
