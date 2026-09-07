@@ -10,7 +10,7 @@
 #define MONITOR_H
 
 /* command handler and command types */
-typedef void (*command_handler)(int argc, char **argv);
+typedef int (*command_handler)(int argc, char **argv);
 
 struct Command {
 	const char *name;
@@ -36,27 +36,27 @@ static struct Command const commands[] = {
 	{
 		"help", 
 		"Displays this list of commands", 
-		(command_handler) mon_help
+		mon_help
 	}, {
 		"backtrace",
 		"Displays the current stack backtrace",
-		(command_handler) mon_backtrace
+		mon_backtrace
 	}, {
 		"hextee",
 		"Reads from input and outputs the hexadecimal codes",
-		(command_handler) mon_hextee
+		mon_hextee
 	}, {
 		"kerninfo",
 		"Displays information about the kernel", 
-		(command_handler) mon_kerninfo
+		mon_kerninfo
 	}, {
 		"status",
 		"Displays current status of the system", 
-		(command_handler) mon_status
+		mon_status
 	}, {
 		"execute",
 		"Executes a user program",
-		(command_handler) mon_execute
+		mon_execute
 	}
 };
 
